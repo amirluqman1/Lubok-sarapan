@@ -12,7 +12,7 @@ async function assemblyStart(page) {
   });
 }
 async function shoot(page, file, opts = {}) {
-  await page.screenshot({ path: path.join(OUT, file), ...opts });
+  await page.screenshot({ path: path.join(OUT, file), ...opts }); // PNG; repo copies were converted to JPG to save space
   console.log('saved', file);
 }
 

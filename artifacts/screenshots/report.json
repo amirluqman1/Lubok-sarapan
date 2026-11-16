@@ -1,0 +1,44 @@
+{
+  "desktop": {
+    "reverse": {
+      "asm": 0.3,
+      "rice": 1,
+      "chicken": 0
+    },
+    "yawAfterDrag": 0.24398400000000858,
+    "yawAfterReset": 6.283185,
+    "overflowX": 0,
+    "info": {
+      "tier": "high",
+      "mode": "auto",
+      "buildTier": "high",
+      "detected": "high",
+      "gpu": "",
+      "calls": 46,
+      "triangles": 767684,
+      "fps": 47
+    },
+    "errors": []
+  },
+  "mobile": {
+    "reverse": {
+      "asm": 0.3,
+      "rice": 1,
+      "chicken": 0
+    },
+    "yawAfterDrag": 0.24799199999999702,
+    "yawAfterReset": 6.283185,
+    "overflowX": 0,
+    "info": {
+      "tier": "medium",
+      "mode": "auto",
+      "buildTier": "medium",
+      "detected": "medium",
+      "gpu": "",
+      "calls": 46,
+      "triangles": 386616,
+      "fps": 49
+    },
+    "errors": []
+  }
+}
