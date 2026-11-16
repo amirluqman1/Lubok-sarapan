@@ -6,8 +6,8 @@ export const sequence = {
   width: 720,
   height: 1280,
   sets: {
-    hd: { path: 'frames/hd/', count: 152, step: 1 },
-    lite: { path: 'frames/lite/', count: 76, step: 2 },
+    hd: { path: 'frames/hd/', count: 152, step: 1, width: 720 },
+    lite: { path: 'frames/lite/', count: 76, step: 2, width: 480 },
   },
   ext: 'webp',
   vhPerUnit: 0.62, // scroll distance (viewport heights) per timeline unit

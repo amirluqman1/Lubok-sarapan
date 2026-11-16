@@ -22,7 +22,11 @@
   <main id="top">
     <section id="film" class="film" aria-label="Nasi lemak diisi lapis demi lapis">
       <canvas class="film__back" id="film-back" aria-hidden="true"></canvas>
-      <canvas class="film__front" id="film-front" role="img" aria-label="Pinggan nasi lemak sedang diisi"></canvas>
+      <div class="film__dim" aria-hidden="true"></div>
+      <div class="film__frame" id="film-frame">
+        <canvas class="film__front" id="film-front" role="img" aria-label="Pinggan nasi lemak sedang diisi"></canvas>
+        <div class="film__fade" aria-hidden="true"></div>
+      </div>
       <div class="film__shade" aria-hidden="true"></div>
       <div class="film__ghosts" id="ghosts" aria-hidden="true"></div>
       <div class="film__grain" aria-hidden="true"></div>

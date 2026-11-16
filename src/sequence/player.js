@@ -10,7 +10,7 @@ export function pickFrameSet(sets) {
   return 'hd';
 }
 
-export function createPlayer({ front, back, cfg, setName, onLoadProgress, onLayout }) {
+export function createPlayer({ frame, front, back, cfg, setName, onLoadProgress, onLayout }) {
   const set = cfg.sets[setName];
   const count = set.count;
   const imgs = new Array(count);
@@ -68,7 +68,6 @@ export function createPlayer({ front, back, cfg, setName, onLoadProgress, onLayo
     // ignore mobile address-bar show/hide (height-only jitter) to avoid canvas flicker
     if (vw === lastW && Math.abs(vh - lastH) < 160 && lastW) return;
     lastW = vw; lastH = vh;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     if (vw / vh < 0.8) {
       mode = 'portrait';
       let w = vw, h = vw / aspect;
@@ -80,33 +79,54 @@ export function createPlayer({ front, back, cfg, setName, onLoadProgress, onLayo
       const cx = vw / 2; // centred; captions sit on either side
       rect = { x: cx - w / 2, y: 0, w, h };
     }
-    Object.assign(front.style, { left: `${rect.x}px`, top: `${rect.y}px`, width: `${rect.w}px`, height: `${rect.h}px` });
-    front.dataset.mode = mode;
-    front.width = Math.round(rect.w * dpr);
-    front.height = Math.round(rect.h * dpr);
-    back.width = 96; back.height = Math.round(96 * vh / vw);
-    current = -1;
+    // the frame window clips the canvas (so camera push-ins stay inside it) and carries the edge fade
+    Object.assign(frame.style, { left: `${rect.x}px`, top: `${rect.y}px`, width: `${rect.w}px`, height: `${rect.h}px` });
+    frame.dataset.mode = mode;
+    // backing store = the frame's native size: drawImage is a straight copy, no resampling
+    front.width = set.width || cfg.width;
+    front.height = Math.round(front.width / aspect);
+    back.width = 24; back.height = Math.max(8, Math.round(24 * vh / vw));
+    current = -1; curKey = -1; backFrame = -99;
     draw(want, true);
     onLayout?.(rect, mode);
   }
 
-  function draw(i, force = false) {
-    want = Math.max(0, Math.min(count - 1, i));
-    const n = nearest(want);
-    if (n < 0 || (n === current && !force)) return;
-    current = n;
-    const im = imgs[n];
-    fctx.drawImage(im, 0, 0, front.width, front.height);
-    // backdrop: cover-fit, tiny, CSS blurs it
-    const s = Math.max(back.width / im.width, back.height / im.height);
-    const bw = im.width * s, bh = im.height * s;
-    bctx.drawImage(im, (back.width - bw) / 2, (back.height - bh) / 2, bw, bh);
+  // Fractional frames are cross-faded (frame a + frame b at alpha = fraction), so motion stays
+  // fluid even when scrolling slower than the video's own 30 fps.
+  let curKey = -1, backFrame = -99;
+  function draw(f, force = false) {
+    want = Math.max(0, Math.min(count - 1, f));
+    const i0 = Math.floor(want);
+    const a = nearest(i0);
+    if (a < 0) return;
+    const frac = want - i0;
+    const b = a === i0 && frac > 0.03 && i0 + 1 < count && ready[i0 + 1] ? i0 + 1 : -1;
+    const q = b < 0 ? 0 : Math.round(frac * 12) / 12;
+    const key = a * 100 + q * 48;
+    if (key === curKey && !force) return;
+    curKey = key; current = a;
+    fctx.globalAlpha = 1;
+    fctx.drawImage(imgs[a], 0, 0, front.width, front.height);
+    if (q > 0) {
+      fctx.globalAlpha = q;
+      fctx.drawImage(imgs[b], 0, 0, front.width, front.height);
+      fctx.globalAlpha = 1;
+    }
+    // backdrop: a tiny cover-fit copy, upscaled by the browser (soft by itself, no CSS blur).
+    // Only refreshed every few frames — it is out of focus anyway.
+    if (force || Math.abs(a - backFrame) >= 6) {
+      backFrame = a;
+      const im = imgs[a];
+      const s = Math.max(back.width / im.width, back.height / im.height);
+      const bw = im.width * s, bh = im.height * s;
+      bctx.drawImage(im, (back.width - bw) / 2, (back.height - bh) / 2, bw, bh);
+    }
   }
 
   /** p in [0,1] → frame */
-  function setProgress(p) { draw(Math.round(p * (count - 1))); }
-  /** frame index in HD units (0..151), works for any set */
-  function drawHD(i) { draw(Math.round(i / set.step)); }
+  function setProgress(p) { draw(p * (count - 1)); }
+  /** frame index in HD units (0..151, may be fractional), works for any set */
+  function drawHD(i) { draw(i / set.step); }
 
   window.addEventListener('resize', layout);
   layout();

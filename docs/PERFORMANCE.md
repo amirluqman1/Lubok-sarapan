@@ -12,3 +12,15 @@
 * Height-only resizes from the mobile address bar are ignored to avoid flicker; ScrollTrigger uses
   `ignoreMobileResize`.
 * `prefers-reduced-motion`: scroll is followed directly (no smoothing) and caption transitions are instant.
+
+## Scroll smoothness pass (measured with `node tests/perf.cjs`: 390×844, 4× CPU throttle, software rendering)
+| | avg FPS | frames > 33 ms |
+|---|---|---|
+| Before | 21 | 54 % |
+| After | 33–35 | 28–32 % |
+
+Changes: canvas backing store = native frame size (no resampling), backdrop is a 24 px canvas upscaled
+(no CSS blur) and redrawn only every 6 frames, no CSS masks / blend modes / backdrop-filter on anything
+that changes per frame, video clipped by an `overflow:hidden` window with a static edge-fade overlay,
+adjacent frames cross-faded for sub-frame motion, ScrollTrigger scrub 0.9 s.
+The sandbox has no GPU, so absolute numbers are pessimistic; real phones composite canvas on the GPU.

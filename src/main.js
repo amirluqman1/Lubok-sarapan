@@ -41,13 +41,16 @@ $('#progress').innerHTML = CH.map((c) => `<li><span></span><em>${esc(c.title)}</
 
 // ---------- player + camera push-in (transform on the frame canvas)
 const front = $('#film-front');
+const frameEl = $('#film-frame');
 const cam = { s: 1, fx: 0.5, fy: 0.55, ox: 0 }; // scale, focus (video coords 0–1), x-shift (fraction of viewport)
 let rect = { w: 1, h: 1 };
 function applyCam() {
   const Fx = cam.fx * rect.w, Fy = cam.fy * rect.h;
-  front.style.transform = `translate(${(Fx * (1 - cam.s) + cam.ox * window.innerWidth).toFixed(2)}px, ${(Fy * (1 - cam.s)).toFixed(2)}px) scale(${cam.s.toFixed(4)})`;
+  front.style.transform = `translate(${(Fx * (1 - cam.s)).toFixed(2)}px, ${(Fy * (1 - cam.s)).toFixed(2)}px) scale(${cam.s.toFixed(4)})`;
+  frameEl.style.transform = cam.ox ? `translateX(${(cam.ox * window.innerWidth).toFixed(1)}px)` : '';
 }
 const player = createPlayer({
+  frame: frameEl,
   front,
   back: $('#film-back'),
   cfg: SEQ,
@@ -124,7 +127,7 @@ const st = ScrollTrigger.create({
   anticipatePin: 1,
   invalidateOnRefresh: true,
   animation: tl,
-  scrub: reduced ? true : 0.5,
+  scrub: reduced ? true : 0.9,
 });
 window.__st = st;
 window.__tl = tl;
