@@ -1,29 +1,25 @@
-# Architecture
+# Architecture (Phase 1: scroll film only)
 
 ```
-index.html                 all sections: scroll sequence, menu, story, promos, location, WhatsApp order, footer
-media/nasi-lemak-assembly.mp4   source video (empty plate → complete dish, 720×1280, 152 frames)
-scripts/extract-frames.sh  video → public/frames/{hd,lite}/NNN.webp + public/img/menu-*.webp crops
-public/frames/hd/          152 frames, 720 px wide (~7 MB total)
-public/frames/lite/        76 frames (every 2nd), 480 px wide (~2 MB) for slow connections / save-data
+index.html                 one pinned "film" section: intro → 7 ingredient chapters → finale
+media/nasi-lemak-assembly.mp4   source video (720×1280, 152 frames)
+scripts/extract-frames.sh  video → public/frames/{hd,lite}/NNN.webp + public/img/*.webp
 src/
-  main.js                  ScrollTrigger pin + scrub → player frame, step captions, ingredient chips, CTA
-  sequence/player.js       canvas image-sequence player: progressive coarse-to-fine loading,
-                           nearest-loaded-frame fallback, portrait/landscape layout, blurred backdrop
-  config/sequence.js       frame sets, scroll length, frame index where each step starts
-  config/restaurant.js     ALL business data + caption copy
-  ui/site.js               config-driven sections, nav drawer, cart → WhatsApp message
-  styles/main.css          mobile-first styles
-tests/screenshots.cjs      Playwright: drives the real scroll, records frame/step per position, reverse check
+  main.js                  builds captions from config; ONE GSAP master timeline scrubbed by ScrollTrigger
+  sequence/player.js       canvas image-sequence player (progressive loading, layout, blurred backdrop)
+  config/sequence.js       choreography: frame range, scroll weight, camera focus/zoom, captions per ingredient
+  config/restaurant.js     business data (name, WhatsApp, …) — menu/promo/location data kept for Phase 2
+  ui/site.js               Phase-2 sections (menu, story, promos, location, order) — not loaded yet
+  styles/main.css
+tests/screenshots.cjs      Playwright: real scroll at each chapter, records frame + visible caption
 ```
 
-## How the animation works
-1. The page opens on frame 0 (empty plate) with the title and first caption already visible.
-2. `#sequence` is pinned for 4.5 viewport heights. Scroll progress p (0–1, smoothed by `scrub: 0.4`)
-   selects frame `round(p × (count−1))`, drawn to a canvas. Scrolling up plays it backwards.
-3. Caption, step number and ingredient chips change at the frame indices in `config/sequence.js`
-   while the frames play; "Order Sekarang" appears on the finished dish.
+## The film timeline (all scroll-scrubbed, so reverse scrolling plays it backwards)
+| Part | What happens |
+|---|---|
+| Intro | Empty plate. Giant "Nasi / Lemak" splits apart, letterbox bars open. |
+| Chapter × 7 | Video frames for that ingredient; camera pushes in on where it lands; numbered caption + notes slide in, stay readable, slide out; a giant ghost word drifts behind (blend: overlay); progress segment fills. |
+| Finale | Last frames settle, camera pulls back (desktop: dish slides right), "Nasi Lemak Istimewa", tagline, Order Sekarang + Tonton semula. |
 
-## Swapping the video
-Replace `media/nasi-lemak-assembly.mp4`, run `npm run frames`, then update `count` and the `at` frame
-numbers in `src/config/sequence.js` (open a few frames in `public/frames/hd/` to find them).
+Each chapter's scroll length comes from its `weight`, not from how many video frames it has, so short
+moments (egg, peanuts) still give time to read.

@@ -17,22 +17,28 @@ const OUT = process.argv[2] || 'artifacts/screenshots';
     const st = await page.evaluate(() => ({ start: window.__st.start, end: window.__st.end }));
     const go = async (p) => {
       await page.evaluate((y) => window.scrollTo(0, y), Math.round(st.start + p * (st.end - st.start)));
-      await page.waitForTimeout(900);
+      await page.waitForTimeout(1300);
     };
     const shot = async (file) => { await page.screenshot({ path: path.join(OUT, `${vp.name}-${file}.png`) }); console.log('saved', vp.name, file); };
     const r = (report[vp.name] = { frames: {} });
-    for (const [p, name] of [[0, '01-empty-plate'], [0.12, '02-rice'], [0.3, '03-sambal'], [0.5, '04-egg-cucumber'], [0.7, '05-anchovy-peanut'], [0.82, '06-chicken'], [1, '07-complete']]) {
-      await go(p);
-      r.frames[name] = await page.evaluate(() => ({ frame: window.__seq.frame, step: document.querySelector('#seq-stitle').textContent }));
+    // positions are timeline labels' progress (intro, mid-chapter for each ingredient, finale)
+    const marks = await page.evaluate(() => {
+      const tl = window.__tl, D = tl.duration();
+      const at = (t) => t / D;
+      return { intro: 0, introOut: at(0.8) };
+    });
+    const total = await page.evaluate(() => window.__tl.duration());
+    const units = [[0, '00-intro'], [0.9, '01-empty-plate'], [1.75, '02-rice'], [3.0, '03-sambal'], [4.2, '04-egg'], [5.3, '05-cucumber'], [6.4, '06-anchovy'], [7.4, '07-peanut'], [8.6, '08-chicken'], [total, '09-finale']];
+    for (const [u, name] of units) {
+      await go(u / total);
+      r.frames[name] = await page.evaluate(() => {
+        const vis = [...document.querySelectorAll('.chap')].filter((c) => getComputedStyle(c).visibility === 'visible' && +getComputedStyle(c).opacity > 0.5).map((c) => c.querySelector('h2').textContent);
+        return { frame: window.__seq.frame, caption: vis.join(',') };
+      });
       await shot(name);
     }
-    await go(0.3);
-    r.reverse = await page.evaluate(() => ({ frame: window.__seq.frame, step: document.querySelector('#seq-stitle').textContent }));
-    for (const id of ['menu', 'kisah', 'lokasi', 'order']) {
-      await page.evaluate((id) => document.getElementById(id).scrollIntoView(), id);
-      await page.waitForTimeout(500);
-      await shot(`08-${id}`);
-    }
+    await go(3.0 / total);
+    r.reverse = await page.evaluate(() => ({ frame: window.__seq.frame }));
     r.overflowX = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     r.errors = logs.filter((l) => /error|failed/i.test(l));
     await page.context().close();

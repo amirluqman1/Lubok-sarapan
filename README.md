@@ -1,8 +1,9 @@
 # Nasi Lemak Istimewa — laman web restoran
 
-Laman web restoran nasi lemak (mobile-first). Bahagian utama ialah animasi **video ikut skrol**:
-pinggan kosong diisi nasi, sambal, telur, timun, ikan bilis, kacang dan ayam bila pengguna skrol,
-dengan teks setiap bahan dipaparkan serentak. Skrol ke atas = animasi berundur.
+Laman web restoran nasi lemak (mobile-first). **Fasa 1 (sekarang): animasi "filem" ikut skrol sahaja.**
+Pinggan kosong diisi nasi, sambal, telur, timun, ikan bilis, kacang dan ayam bila pengguna skrol.
+Setiap bahan ada babak sendiri: kapsyen bernombor, perkataan gergasi, dan kamera zoom ke bahan itu.
+Skrol ke atas = animasi berundur. Menu, kisah, promosi, lokasi & order dibuat dalam Fasa 2.
 
 **Laman langsung:** https://amirluqman1.github.io/Lubok-sarapan/ (dikemas kini automatik setiap push)
 
@@ -25,7 +26,7 @@ kapsyen setiap bahan. Medan kosong dipaparkan sebagai "akan dikemas kini".
 ## Tukar video
 1. Ganti `media/nasi-lemak-assembly.mp4` (satu shot, pinggan kosong → lengkap, tegak 9:16).
 2. `npm run frames`
-3. Kemas kini `count` dan nombor frame `at` dalam `src/config/sequence.js`.
+3. Kemas kini `count`, julat frame (`from`/`to`) dan titik fokus kamera dalam `src/config/sequence.js`.
 
 ## Ujian
 ```bash

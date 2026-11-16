@@ -10,7 +10,7 @@ export function pickFrameSet(sets) {
   return 'hd';
 }
 
-export function createPlayer({ front, back, cfg, setName, onLoadProgress }) {
+export function createPlayer({ front, back, cfg, setName, onLoadProgress, onLayout }) {
   const set = cfg.sets[setName];
   const count = set.count;
   const imgs = new Array(count);
@@ -77,7 +77,7 @@ export function createPlayer({ front, back, cfg, setName, onLoadProgress }) {
     } else {
       mode = 'landscape';
       const h = vh, w = h * aspect;
-      const cx = vw < 900 ? vw / 2 : Math.min(vw - w / 2 - vw * 0.04, vw * 0.66);
+      const cx = vw / 2; // centred; captions sit on either side
       rect = { x: cx - w / 2, y: 0, w, h };
     }
     Object.assign(front.style, { left: `${rect.x}px`, top: `${rect.y}px`, width: `${rect.w}px`, height: `${rect.h}px` });
@@ -87,6 +87,7 @@ export function createPlayer({ front, back, cfg, setName, onLoadProgress }) {
     back.width = 96; back.height = Math.round(96 * vh / vw);
     current = -1;
     draw(want, true);
+    onLayout?.(rect, mode);
   }
 
   function draw(i, force = false) {
@@ -104,12 +105,17 @@ export function createPlayer({ front, back, cfg, setName, onLoadProgress }) {
 
   /** p in [0,1] → frame */
   function setProgress(p) { draw(Math.round(p * (count - 1))); }
+  /** frame index in HD units (0..151), works for any set */
+  function drawHD(i) { draw(Math.round(i / set.step)); }
 
   window.addEventListener('resize', layout);
   layout();
 
   return {
     setProgress,
+    drawHD,
+    get rect() { return rect; },
+    get mode() { return mode; },
     ready: firstFrame,
     get loaded() { return loaded / count; },
     get frame() { return current * set.step; }, // in HD-frame units

@@ -1,76 +1,98 @@
 {
   "mobile": {
     "frames": {
+      "00-intro": {
+        "frame": 0,
+        "caption": ""
+      },
       "01-empty-plate": {
         "frame": 0,
-        "step": "Pinggan kosong"
+        "caption": ""
       },
       "02-rice": {
-        "frame": 18,
-        "step": "Nasi santan"
+        "frame": 16,
+        "caption": "Nasi santan"
       },
       "03-sambal": {
-        "frame": 45,
-        "step": "Sambal"
+        "frame": 40,
+        "caption": "Sambal"
       },
-      "04-egg-cucumber": {
+      "04-egg": {
+        "frame": 59,
+        "caption": "Telur rebus"
+      },
+      "05-cucumber": {
         "frame": 76,
-        "step": "Timun"
+        "caption": "Timun"
       },
-      "05-anchovy-peanut": {
-        "frame": 106,
-        "step": "Kacang tanah"
+      "06-anchovy": {
+        "frame": 94,
+        "caption": "Ikan bilis"
       },
-      "06-chicken": {
-        "frame": 124,
-        "step": "Ayam goreng"
+      "07-peanut": {
+        "frame": 105,
+        "caption": "Kacang tanah"
       },
-      "07-complete": {
+      "08-chicken": {
+        "frame": 122,
+        "caption": "Ayam goreng"
+      },
+      "09-finale": {
         "frame": 151,
-        "step": "Siap dihidang"
+        "caption": ""
       }
     },
     "reverse": {
-      "frame": 45,
-      "step": "Sambal"
+      "frame": 40
     },
     "overflowX": 0,
     "errors": []
   },
   "desktop": {
     "frames": {
+      "00-intro": {
+        "frame": 0,
+        "caption": ""
+      },
       "01-empty-plate": {
         "frame": 0,
-        "step": "Pinggan kosong"
+        "caption": ""
       },
       "02-rice": {
-        "frame": 18,
-        "step": "Nasi santan"
+        "frame": 16,
+        "caption": "Nasi santan"
       },
       "03-sambal": {
-        "frame": 45,
-        "step": "Sambal"
+        "frame": 40,
+        "caption": "Sambal"
       },
-      "04-egg-cucumber": {
+      "04-egg": {
+        "frame": 59,
+        "caption": "Telur rebus"
+      },
+      "05-cucumber": {
         "frame": 76,
-        "step": "Timun"
+        "caption": "Timun"
       },
-      "05-anchovy-peanut": {
-        "frame": 106,
-        "step": "Kacang tanah"
+      "06-anchovy": {
+        "frame": 94,
+        "caption": "Ikan bilis"
       },
-      "06-chicken": {
-        "frame": 124,
-        "step": "Ayam goreng"
+      "07-peanut": {
+        "frame": 105,
+        "caption": "Kacang tanah"
       },
-      "07-complete": {
+      "08-chicken": {
+        "frame": 122,
+        "caption": "Ayam goreng"
+      },
+      "09-finale": {
         "frame": 151,
-        "step": "Siap dihidang"
+        "caption": ""
       }
     },
     "reverse": {
-      "frame": 45,
-      "step": "Sambal"
+      "frame": 40
     },
     "overflowX": 0,
     "errors": []
