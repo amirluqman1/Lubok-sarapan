@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0604" />
+  <title>Lubok Sarapan — Nasi Lemak Istimewa</title>
+  <meta name="description" content="Nasi lemak istimewa: nasi santan, sambal, telur, timun, ikan bilis, kacang dan ayam goreng berempah — dalam pengalaman 3D interaktif." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23e8dcc6'/%3E%3Cpath d='M14 38c0-12 8-20 18-20s18 8 18 20z' fill='%23f6f0e2'/%3E%3Cpath d='M24 26c4-5 14-5 18 2-6 3-12 2-18-2z' fill='%23a3200d'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <a class="skip" href="#menu">Langkau ke menu</a>
+
+  <div id="loader" class="loader" role="status" aria-live="polite">
+    <div class="loader__inner">
+      <p class="loader__brand" data-cfg="name">Lubok Sarapan</p>
+      <p class="loader__title">Menyediakan hidangan…</p>
+      <div class="loader__bar"><span id="loader-fill"></span></div>
+      <p class="loader__step"><span id="loader-step">Memulakan</span> · <span id="loader-pct">0%</span></p>
+    </div>
+  </div>
+
+  <canvas id="stage" class="stage" aria-label="Paparan 3D nasi lemak yang boleh dipusing" role="img" tabindex="-1"></canvas>
+  <div class="stage-vignette" aria-hidden="true"></div>
+
+  <header class="nav" id="nav">
+    <a class="nav__brand" href="#hero" data-cfg="name">Lubok Sarapan</a>
+    <nav class="nav__links" aria-label="Navigasi utama">
+      <a href="#menu">Menu</a>
+      <a href="#kisah">Kisah</a>
+      <a href="#promosi">Promosi</a>
+      <a href="#lokasi">Lokasi</a>
+    </nav>
+    <div class="nav__actions">
+      <label class="quality" title="Kualiti grafik 3D">
+        <span class="quality__label">3D</span>
+        <select id="quality-select" aria-label="Kualiti grafik 3D">
+          <option value="auto">Auto</option>
+          <option value="low">Rendah</option>
+          <option value="medium">Sederhana</option>
+          <option value="high">Tinggi</option>
+        </select>
+      </label>
+      <a class="btn btn--small btn--accent nav__order" href="#order">Order</a>
+      <button class="nav__burger" id="burger" aria-label="Buka menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span></button>
+    </div>
+  </header>
+  <div class="drawer" id="drawer" hidden>
+    <a href="#menu">Menu</a>
+    <a href="#kisah">Kisah kami</a>
+    <a href="#promosi">Promosi</a>
+    <a href="#lokasi">Lokasi & waktu</a>
+    <a href="#order" class="btn btn--accent">Order melalui WhatsApp</a>
+  </div>
+
+  <main>
+    <!-- 1. HERO (completed dish, slow cinematic orbit) -->
+    <section id="hero" class="hero" aria-labelledby="hero-title">
+      <div class="hero__copy">
+        <p class="eyebrow" data-cfg="name">Lubok Sarapan</p>
+        <h1 id="hero-title" class="hero__title">Nasi lemak,<br /><em>dibina dengan teliti.</em></h1>
+        <p class="hero__lede">Nasi santan wangi, sambal pekat berkilat, ayam goreng rangup. Skrol ke bawah dan lihat setiap lapisan disusun.</p>
+        <div class="hero__cta">
+          <a class="btn btn--accent" href="#menu">Lihat menu</a>
+          <a class="btn btn--ghost" href="#assembly">Mula susun ↓</a>
+        </div>
+      </div>
+      <div class="scroll-cue" aria-hidden="true"><span></span>Skrol</div>
+      <div class="fallback-art" aria-hidden="true"></div>
+    </section>
+
+    <!-- 2/3. PINNED SCROLL ASSEMBLY -->
+    <section id="assembly" class="assembly" aria-label="Penyusunan nasi lemak lapis demi lapis">
+      <div class="assembly__ui">
+        <ol class="steps" id="steps"></ol>
+        <div class="rail" aria-hidden="true"><span id="rail-fill"></span></div>
+        <p class="assembly__pct" aria-hidden="true"><span id="pct">0</span>%</p>
+        <div class="reveal" id="reveal">
+          <p class="eyebrow">Hidangan lengkap</p>
+          <h2 class="reveal__title">NASI LEMAK ISTIMEWA</h2>
+          <p class="reveal__tag">“Setiap suapan, penuh rasa.”</p>
+          <a class="btn btn--accent btn--lg" href="#menu" id="order-now">Order Sekarang</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. INTERACTIVE 360° SHOWCASE -->
+    <section id="showcase" class="showcase" aria-labelledby="showcase-title">
+      <div class="showcase__top">
+        <p class="eyebrow">Pusing 360°</p>
+        <h2 id="showcase-title">Lihat dari setiap sudut</h2>
+        <p class="showcase__hint" id="showcase-hint">Seret ke kiri / kanan untuk memusing pinggan. Skrol seperti biasa untuk teruskan.</p>
+      </div>
+      <div class="showcase__controls" role="group" aria-label="Kawalan paparan 3D">
+        <button class="chip" id="rot-left" aria-label="Pusing ke kiri">⟲</button>
+        <button class="chip" id="rot-reset">Set semula</button>
+        <button class="chip" id="rot-free" aria-pressed="false" title="Benarkan seret atas/bawah untuk condongkan pinggan">Mod putar bebas</button>
+        <button class="chip" id="rot-right" aria-label="Pusing ke kanan">⟳</button>
+      </div>
+      <ul class="showcase__chips" aria-label="Bahan">
+        <li>Nasi santan</li><li>Sambal</li><li>Telur rebus</li><li>Timun</li><li>Ikan bilis</li><li>Kacang</li><li>Ayam goreng</li>
+      </ul>
+    </section>
+
+    <!-- 5. MENU -->
+    <section id="menu" class="panel menu" aria-labelledby="menu-title">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Menu pilihan</p>
+          <h2 id="menu-title">Dari dapur kami</h2>
+          <p class="section-head__sub">Gambar menu ialah render sebenar model 3D di atas — bukan foto stok.</p>
+        </header>
+        <div class="menu__grid" id="menu-grid"></div>
+        <div class="drinks" id="drinks"></div>
+      </div>
+    </section>
+
+    <!-- 6. STORY -->
+    <section id="kisah" class="panel story" aria-labelledby="story-title">
+      <div class="container story__grid">
+        <div>
+          <p class="eyebrow">Kisah kami</p>
+          <h2 id="story-title" data-cfg="story.title"></h2>
+          <div id="story-body" class="story__body"></div>
+        </div>
+        <ul class="pillars" id="pillars"></ul>
+      </div>
+    </section>
+
+    <!-- 7. PROMOTIONS -->
+    <section id="promosi" class="panel promos" aria-labelledby="promo-title">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Promosi</p>
+          <h2 id="promo-title">Tawaran semasa</h2>
+        </header>
+        <div class="promos__grid" id="promos"></div>
+      </div>
+    </section>
+
+    <!-- 8. LOCATION & HOURS -->
+    <section id="lokasi" class="panel location" aria-labelledby="loc-title">
+      <div class="container location__grid">
+        <div>
+          <p class="eyebrow">Lokasi</p>
+          <h2 id="loc-title">Singgah sarapan</h2>
+          <p class="location__addr" id="addr"></p>
+          <a class="btn btn--ghost" id="maps-link" target="_blank" rel="noopener" hidden>Buka di Google Maps</a>
+        </div>
+        <div class="hours">
+          <h3>Waktu operasi</h3>
+          <dl id="hours"></dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. WHATSAPP ORDER -->
+    <section id="order" class="panel order" aria-labelledby="order-title">
+      <div class="container order__box">
+        <div>
+          <p class="eyebrow">Order</p>
+          <h2 id="order-title">Lapar? Order terus melalui WhatsApp.</h2>
+          <p>Pilih item di menu (butang “+ Tambah”), kemudian hantar senarai pesanan anda dalam satu mesej.</p>
+        </div>
+        <div class="order__summary" id="order-summary" aria-live="polite"></div>
+        <a class="btn btn--wa btn--lg" id="wa-btn" target="_blank" rel="noopener">Order melalui WhatsApp</a>
+        <p class="order__note" id="wa-note"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__grid">
+      <div>
+        <p class="footer__brand" data-cfg="name">Lubok Sarapan</p>
+        <p class="footer__small">Visual 3D dijana sepenuhnya secara prosedur (Three.js) — tiada foto digunakan.</p>
+      </div>
+      <nav class="footer__links" aria-label="Pautan kaki">
+        <a href="#menu">Menu</a><a href="#kisah">Kisah</a><a href="#promosi">Promosi</a><a href="#lokasi">Lokasi</a><a href="#order">Order</a>
+      </nav>
+      <p class="footer__small" id="footer-copy"></p>
+    </div>
+  </footer>
+
+  <div class="cartbar" id="cartbar" hidden>
+    <span id="cart-count">0 item</span>
+    <a class="btn btn--wa btn--small" href="#order">Semak pesanan</a>
+  </div>
+
+  <noscript><p class="noscript">Laman ini memerlukan JavaScript untuk paparan 3D. Menu dan maklumat kedai masih boleh dibaca di bawah.</p></noscript>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

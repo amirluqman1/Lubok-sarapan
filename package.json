@@ -1,0 +1,23 @@
+{
+  "name": "nasilemak-cinematic-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Laman web restoran nasi lemak dengan pengalaman 3D sinematik (Three.js + GSAP ScrollTrigger)",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "build:single": "vite build --mode single",
+    "preview": "vite preview --host",
+    "test:smoke": "node tests/smoke.cjs",
+    "screenshots": "node tests/screenshots.cjs"
+  },
+  "dependencies": {
+    "gsap": "^3.13.0",
+    "three": "^0.181.2"
+  },
+  "devDependencies": {
+    "vite": "^7.1.12",
+    "vite-plugin-singlefile": "^2.3.0"
+  }
+}
