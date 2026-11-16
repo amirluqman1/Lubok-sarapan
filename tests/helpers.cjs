@@ -1,7 +1,7 @@
 const { chromium } = require('playwright');
 const URL = process.env.NL_URL || 'http://localhost:4173/';
 async function launch() {
-  return chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+  return chromium.launch();
 }
 async function openPage(browser, { width = 1280, height = 800, mobile = false, query = '' } = {}) {
   const ctx = await browser.newContext(mobile
@@ -14,20 +14,9 @@ async function openPage(browser, { width = 1280, height = 800, mobile = false, q
   page.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}`));
   page.on('requestfailed', (r) => logs.push(`[requestfailed] ${r.url()} ${r.failure()?.errorText}`));
   await page.goto(URL + query, { waitUntil: 'load' });
-  await page.waitForFunction(() => window.__nl || document.documentElement.classList.contains('no-webgl'), null, { timeout: 180000 });
-  await page.waitForTimeout(1500);
+  await page.waitForFunction(() => document.documentElement.classList.contains('seq-ready'), null, { timeout: 60000 });
+  // wait for every frame to finish loading so screenshots show exact frames
+  await page.waitForFunction(() => window.__seq && window.__seq.loaded >= 1, null, { timeout: 120000 });
   return { ctx, page, logs };
 }
-/** Scroll so that the assembly ScrollTrigger reports progress p, then wait for smoothing to settle. */
-async function scrollToAssembly(page, p, settle = 2500) {
-  await page.evaluate((p) => {
-    const st = window.ScrollTriggerRef;
-    const el = document.querySelector('#assembly');
-    const pinStart = el.getBoundingClientRect().top + window.scrollY; // before pin applied this is the start
-    const hero = document.querySelector('#hero');
-    const start = hero.offsetHeight;
-    window.scrollTo(0, start + p * window.innerHeight * 5);
-  }, p);
-  await page.waitForTimeout(settle);
-}
-module.exports = { launch, openPage, scrollToAssembly, URL };
+module.exports = { launch, openPage, URL };

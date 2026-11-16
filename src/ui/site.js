@@ -23,14 +23,10 @@ export function renderSite() {
   document.querySelectorAll('[data-cfg="name"]').forEach((el) => { el.textContent = R.name; });
   document.title = `${R.name} — Nasi Lemak Istimewa`;
 
-  // assembly captions
-  $('#steps').innerHTML = R.assemblySteps.slice(0, 8).map((s, i) => `
-    <li data-step="${i}"><span class="num">${String(i + 1).padStart(2, '0')} / 08</span><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></li>`).join('');
-
   // menu
   $('#menu-grid').innerHTML = R.menu.map((m) => `
     <article class="card" data-id="${m.id}">
-      <div class="card__img">${m.tag ? `<span class="card__tag">${esc(m.tag)}</span>` : ''}<img alt="${esc(m.name)} — render 3D" data-snapshot="${m.snapshot}" hidden /></div>
+      <div class="card__img">${m.tag ? `<span class="card__tag">${esc(m.tag)}</span>` : ''}${m.image ? `<img src="${esc(m.image)}" alt="${esc(m.name)}" loading="lazy" decoding="async" width="800" height="600" />` : ''}</div>
       <div class="card__body">
         <h3>${esc(m.name)}</h3>
         <p>${esc(m.desc)}</p>
@@ -119,11 +115,4 @@ function bindNav() {
   });
   drawer.addEventListener('click', (e) => { if (e.target.closest('a')) close(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
-}
-
-export function applySnapshots(map) {
-  document.querySelectorAll('img[data-snapshot]').forEach((img) => {
-    const src = map[img.dataset.snapshot];
-    if (src) { img.src = src; img.hidden = false; }
-  });
 }

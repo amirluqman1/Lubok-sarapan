@@ -1,44 +1,78 @@
 {
-  "desktop": {
+  "mobile": {
+    "frames": {
+      "01-empty-plate": {
+        "frame": 0,
+        "step": "Pinggan kosong"
+      },
+      "02-rice": {
+        "frame": 18,
+        "step": "Nasi santan"
+      },
+      "03-sambal": {
+        "frame": 45,
+        "step": "Sambal"
+      },
+      "04-egg-cucumber": {
+        "frame": 76,
+        "step": "Timun"
+      },
+      "05-anchovy-peanut": {
+        "frame": 106,
+        "step": "Kacang tanah"
+      },
+      "06-chicken": {
+        "frame": 124,
+        "step": "Ayam goreng"
+      },
+      "07-complete": {
+        "frame": 151,
+        "step": "Siap dihidang"
+      }
+    },
     "reverse": {
-      "asm": 0.3,
-      "rice": 1,
-      "chicken": 0
+      "frame": 45,
+      "step": "Sambal"
     },
-    "yawAfterDrag": 0.24398400000000858,
-    "yawAfterReset": 6.283185,
     "overflowX": 0,
-    "info": {
-      "tier": "high",
-      "mode": "auto",
-      "buildTier": "high",
-      "detected": "high",
-      "gpu": "",
-      "calls": 46,
-      "triangles": 767684,
-      "fps": 47
-    },
     "errors": []
   },
-  "mobile": {
+  "desktop": {
+    "frames": {
+      "01-empty-plate": {
+        "frame": 0,
+        "step": "Pinggan kosong"
+      },
+      "02-rice": {
+        "frame": 18,
+        "step": "Nasi santan"
+      },
+      "03-sambal": {
+        "frame": 45,
+        "step": "Sambal"
+      },
+      "04-egg-cucumber": {
+        "frame": 76,
+        "step": "Timun"
+      },
+      "05-anchovy-peanut": {
+        "frame": 106,
+        "step": "Kacang tanah"
+      },
+      "06-chicken": {
+        "frame": 124,
+        "step": "Ayam goreng"
+      },
+      "07-complete": {
+        "frame": 151,
+        "step": "Siap dihidang"
+      }
+    },
     "reverse": {
-      "asm": 0.3,
-      "rice": 1,
-      "chicken": 0
+      "frame": 45,
+      "step": "Sambal"
     },
-    "yawAfterDrag": 0.24799199999999702,
-    "yawAfterReset": 6.283185,
     "overflowX": 0,
-    "info": {
-      "tier": "medium",
-      "mode": "auto",
-      "buildTier": "medium",
-      "detected": "medium",
-      "gpu": "",
-      "calls": 46,
-      "triangles": 386616,
-      "fps": 49
-    },
     "errors": []
   }
 }

@@ -20,13 +20,13 @@ export const restaurant = {
   social: { instagram: '', facebook: '', tiktok: '' },
   currency: 'RM',
 
-  // snapshot = render 3D sebenar daripada adegan (full | biasa | chicken | sambal | egg)
+  // image = gambar dalam public/img/ (dipotong daripada frame video sebenar)
   menu: [
-    { id: 'nl-ayam', name: 'Nasi Lemak Ayam Goreng', desc: 'Nasi santan, sambal, telur rebus, timun, ikan bilis, kacang dan ayam goreng berempah.', price: null, snapshot: 'full', tag: 'Pilihan utama' },
-    { id: 'nl-biasa', name: 'Nasi Lemak Biasa', desc: 'Nasi santan, sambal, telur rebus, timun, ikan bilis dan kacang.', price: null, snapshot: 'biasa' },
-    { id: 'ayam', name: 'Ayam Goreng Berempah', desc: 'Ayam goreng rangup berempah — tambahan untuk mana-mana pinggan.', price: null, snapshot: 'chicken' },
-    { id: 'sambal', name: 'Sambal Tambah', desc: 'Satu senduk lagi sambal pekat yang berkilat minyak.', price: null, snapshot: 'sambal' },
-    { id: 'telur', name: 'Telur Rebus', desc: 'Separuh atau sebiji penuh, untuk yang mahu lebih.', price: null, snapshot: 'egg' },
+    { id: 'nl-ayam', name: 'Nasi Lemak Ayam Goreng', desc: 'Nasi santan, sambal, telur rebus, timun, ikan bilis, kacang dan ayam goreng berempah.', price: null, image: 'img/menu-full.webp', tag: 'Pilihan utama' },
+    { id: 'nl-biasa', name: 'Nasi Lemak Biasa', desc: 'Nasi santan, sambal, telur rebus, timun, ikan bilis dan kacang.', price: null, image: 'img/menu-biasa.webp' },
+    { id: 'ayam', name: 'Ayam Goreng Berempah', desc: 'Ayam goreng rangup berempah — tambahan untuk mana-mana pinggan.', price: null, image: 'img/menu-chicken.webp' },
+    { id: 'sambal', name: 'Sambal Tambah', desc: 'Satu senduk lagi sambal pekat yang berkilat minyak.', price: null, image: 'img/menu-sambal.webp' },
+    { id: 'telur', name: 'Telur Rebus', desc: 'Separuh atau sebiji penuh, untuk yang mahu lebih.', price: null, image: 'img/menu-egg.webp' },
   ],
   drinks: [
     { id: 'teh-tarik', name: 'Teh Tarik', price: null },
@@ -54,16 +54,16 @@ export const restaurant = {
     ],
   },
 
-  // Kapsyen setiap langkah dalam animasi pemasangan 3D.
+  // Kapsyen setiap langkah animasi (urutan sama dengan src/config/sequence.js → steps).
   assemblySteps: [
-    { title: 'Pinggan & daun pisang', text: 'Pinggan seramik hangat dialas daun pisang — permulaan setiap nasi lemak.' },
+    { title: 'Pinggan kosong', text: 'Pinggan seramik hangat — sedia untuk diisi.' },
     { title: 'Nasi santan', text: 'Beras wangi ditanak bersama santan dan daun pandan.' },
     { title: 'Sambal', text: 'Sambal cili ditumis perlahan sehingga pecah minyak — pedas, manis, berkilat.' },
     { title: 'Telur rebus', text: 'Telur rebus dibelah dua, kuning telurnya keemasan.' },
     { title: 'Timun', text: 'Hirisan timun segar untuk rasa sejuk yang mengimbangi sambal.' },
     { title: 'Ikan bilis', text: 'Ikan bilis digoreng garing hingga keemasan.' },
-    { title: 'Kacang tanah', text: 'Kacang goreng berkulit — rangup dan sedikit masin.' },
-    { title: 'Ayam goreng berempah', text: 'Diperap rempah dan kunyit, digoreng hingga keraknya rangup.' },
-    { title: 'Nasi Lemak Istimewa', text: 'Setiap suapan, penuh rasa.' },
+    { title: 'Kacang tanah', text: 'Kacang goreng — rangup dan sedikit masin.' },
+    { title: 'Ayam goreng', text: 'Ayam diperap rempah, digoreng hingga kulitnya rangup keemasan.' },
+    { title: 'Siap dihidang', text: 'Setiap suapan, penuh rasa.' },
   ],
 };

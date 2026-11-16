@@ -1,60 +1,38 @@
-# Nasi Lemak Istimewa — laman web restoran 3D sinematik
+# Nasi Lemak Istimewa — laman web restoran
 
-Laman web restoran (mobile-first) dengan pengalaman **3D interaktif sepenuhnya prosedur**:
-pinggan seramik, daun pisang, nasi santan (ribuan butir sebenar), sambal, telur rebus, timun,
-ikan bilis, kacang dan ayam goreng berempah — semuanya geometri Three.js sebenar, tiada foto,
-tiada model AI berbayar. Skrol untuk menyusun nasi lemak lapis demi lapis (GSAP ScrollTrigger),
-kemudian pusing 360° dengan jari atau tetikus.
+Laman web restoran nasi lemak (mobile-first). Bahagian utama ialah animasi **video ikut skrol**:
+pinggan kosong diisi nasi, sambal, telur, timun, ikan bilis, kacang dan ayam bila pengguna skrol,
+dengan teks setiap bahan dipaparkan serentak. Skrol ke atas = animasi berundur.
 
-**Stack:** HTML · CSS · JavaScript · Three.js r181 · GSAP 3.13 + ScrollTrigger · Vite 7
+**Laman langsung:** https://amirluqman1.github.io/Lubok-sarapan/ (dikemas kini automatik setiap push)
+
+**Stack:** HTML · CSS · JavaScript · GSAP 3 + ScrollTrigger · Vite 7 · ffmpeg (untuk pecah video)
 
 ## Jalankan
 
 ```bash
 npm install
-npm run dev          # pelayan pembangunan (http://localhost:5173, juga di rangkaian tempatan)
-npm run build        # binaan produksi → dist/
-npm run preview      # hidang dist/ (http://localhost:4173)
-npm run build:single # SATU fail HTML (semua JS/CSS disisipkan) → dist-single/index.html
+npm run dev       # http://localhost:5173 (juga di rangkaian Wi-Fi yang sama)
+npm run build     # → dist/
+npm run preview   # hidang dist/ di http://localhost:4173
+npm run frames    # tukar media/nasi-lemak-assembly.mp4 → public/frames + gambar menu
 ```
-
-Parameter URL berguna: `?q=low|medium|high` (paksa kualiti) · `?still` (tiada animasi berterusan,
-untuk tangkapan skrin) · `?nowebgl` (uji paparan sandaran tanpa WebGL).
 
 ## Tukar maklumat kedai
+Semua data dalam **`src/config/restaurant.js`**: nama, WhatsApp, alamat, waktu, menu & harga, promosi,
+kapsyen setiap bahan. Medan kosong dipaparkan sebagai "akan dikemas kini".
 
-Semua data perniagaan ada dalam **`src/config/restaurant.js`**: nama, nombor WhatsApp, alamat,
-pautan Maps, waktu operasi, menu & harga, promosi, kapsyen animasi dan teks kisah.
-Medan kosong dipaparkan sebagai "akan dikemas kini" — tiada harga, alamat atau nombor palsu.
-Promosi bertanda `example: true` memaparkan lencana **Contoh** sehingga diganti.
+## Tukar video
+1. Ganti `media/nasi-lemak-assembly.mp4` (satu shot, pinggan kosong → lengkap, tegak 9:16).
+2. `npm run frames`
+3. Kemas kini `count` dan nombor frame `at` dalam `src/config/sequence.js`.
 
-## Uji di telefon Android
-
-1. **Paling mudah (rangkaian Wi-Fi sama):** `npm run dev` di komputer → buka alamat
-   `Network: http://192.168.x.x:5173` yang dipaparkan, di Chrome Android.
-2. **Satu fail:** `npm run build:single` → hantar `dist-single/index.html` ke telefon dan buka
-   dengan Chrome (Fonts Google perlu internet; selebihnya luar talian).
-3. **GitHub Pages (repo ini awam):** `.github/workflows/pages.yml` membina dan menerbitkan `dist/`
-   setiap kali ada push. Sekali sahaja: *Settings → Pages → Source: GitHub Actions*.
-   Alamat: https://amirluqman1.github.io/Lubok-sarapan/
-
-Semak di telefon: skrol perlahan ke atas/bawah dalam bahagian susunan, seret pinggan di bahagian
-"Pusing 360°", dan cuba pemilih **3D** (Auto/Rendah/Sederhana/Tinggi) di bar navigasi.
-
-## Ujian automatik (Playwright, Chromium sebenar + WebGL)
-
+## Ujian
 ```bash
-npm run build && npm run preview &        # port 4173
-node tests/screenshots.cjs artifacts/screenshots   # skrol sebenar, desktop 1440×900 + mudah alih 390×844
-node tests/closeups.cjs artifacts/screenshots/closeups
+npm run build && npm run preview &
+node tests/screenshots.cjs artifacts/screenshots
 ```
 
-`tests/screenshots.cjs` memandu skrol halaman sebenar (ScrollTrigger), menyemak skrol undur,
-seret 360° + butang set semula, limpahan mendatar, ralat konsol, dan menulis `report.json`.
+Dokumen: [ARCHITECTURE](docs/ARCHITECTURE.md) · [PERFORMANCE](docs/PERFORMANCE.md) · [VISUAL-AUDIT](docs/VISUAL-AUDIT.md)
 
-## Dokumen
-
-* [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — struktur modul & aliran data
-* [docs/PERFORMANCE.md](docs/PERFORMANCE.md) — tier kualiti, strategi mudah alih
-* [docs/VISUAL-AUDIT.md](docs/VISUAL-AUDIT.md) — audit visual, skor & had
-* `artifacts/screenshots/` — tangkapan skrin render sebenar
+Versi 3D prosedur (Three.js) yang lama masih ada dalam sejarah git (commit `172711a`).
