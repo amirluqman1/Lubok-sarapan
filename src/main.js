@@ -117,6 +117,12 @@ function setCopy(m) {
   });
   $('#idx').textContent = String(current + 1).padStart(2, '0');
   $$('.card').forEach((c, i) => { c.classList.toggle('is-active', i === current); c.setAttribute('aria-selected', String(i === current)); });
+  // keep the active card visible in the horizontal scroller (phones) without scrolling the page
+  const act = cardsEl.children[current];
+  if (act && cardsEl.scrollWidth > cardsEl.clientWidth) {
+    const left = act.offsetLeft - (cardsEl.clientWidth - act.offsetWidth) / 2;
+    cardsEl.scrollTo({ left: Math.max(0, left), behavior: reduced ? 'auto' : 'smooth' });
+  }
 }
 
 async function show(i, dir = 1) {

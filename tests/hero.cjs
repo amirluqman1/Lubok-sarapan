@@ -18,7 +18,17 @@ const OUT = process.argv[2] || 'artifacts/screenshots';
     await page.waitForTimeout(2500);
     if (!vp.mobile) { await page.mouse.move(vp.width * 0.75, vp.height * 0.3); await page.waitForTimeout(1200); }
     await page.screenshot({ path: `${OUT}/${vp.name}-hero.png` });
+    // walk through every menu with the → button
+    const visited = [];
+    for (let k = 0; k < 6; k++) {
+      visited.push(await page.evaluate(() => ({ i: window.__hero.current, title: document.querySelector('#line1').textContent + ' ' + document.querySelector('#line2').textContent, floaters: window.__hero.floaters })));
+      await page.screenshot({ path: `${OUT}/${vp.name}-menu-${k + 1}.png` });
+      await page.click('#next');
+      await page.waitForTimeout(2200);
+    }
     report[vp.name] = {
+      visited,
+      backToFirst: await page.evaluate(() => window.__hero.current),
       floaters: await page.evaluate(() => window.__hero.floaters),
       overflowX: await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth),
       errors: logs,

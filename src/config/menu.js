@@ -30,42 +30,44 @@ export const menus = [
   {
     id: 'paru', kicker: 'Nasi Lemak', line1: 'Sambal', line2: 'Paru',
     desc: 'Paru goreng bersalut sambal pekat, dihidang dengan nasi santan dan lauk lengkap.',
-    plate: null, price: null,
+    plate: `${base}hidangan-paru.webp`, price: null,
     colors: { inner: '#a8402c', mid: '#561710', outer: '#160504' },
     signature: { img: 'paru', x: 0.46, y: 0.32, size: 0.3, rot: -18, depth: 1.25, front: true },
   },
   {
     id: 'udang', kicker: 'Nasi Lemak', line1: 'Sambal', line2: 'Udang',
     desc: 'Udang besar dimasak sambal merah berkilat, dengan nasi santan dan lauk lengkap.',
-    plate: null, price: null,
+    plate: `${base}hidangan-udang.webp`, price: null,
     colors: { inner: '#e0663c', mid: '#842a14', outer: '#200905' },
     signature: { img: 'udang', x: 0.46, y: 0.32, size: 0.3, rot: -18, depth: 1.25, front: true },
   },
   {
     id: 'sotong', kicker: 'Nasi Lemak', line1: 'Sambal', line2: 'Sotong',
     desc: 'Sotong lembut dalam sambal pedas manis, dengan nasi santan dan lauk lengkap.',
-    plate: null, price: null,
+    plate: `${base}hidangan-sotong.webp`, price: null,
     colors: { inner: '#bb2a30', mid: '#5c0f16', outer: '#180305' },
     signature: { img: 'sotong', x: 0.46, y: 0.32, size: 0.28, rot: -18, depth: 1.25, front: true },
   },
   {
     id: 'kerang', kicker: 'Nasi Lemak', line1: 'Sambal', line2: 'Kerang',
     desc: 'Kerang segar dimasak sambal, dengan nasi santan dan lauk lengkap.',
-    plate: null, price: null,
+    plate: `${base}hidangan-kerang.webp`, price: null,
     colors: { inner: '#a3613a', mid: '#4d2914', outer: '#130904' },
     signature: { img: 'kerang', x: 0.46, y: 0.32, size: 0.28, rot: -18, depth: 1.25, front: true },
   },
   {
     id: 'telur-mata', kicker: 'Nasi Lemak', line1: 'Telur', line2: 'Mata',
     desc: 'Telur mata goreng bertepi rangup, kuning cair, dengan nasi santan dan sambal.',
-    plate: null, price: null,
+    plate: `${base}hidangan-telur-mata.webp`, price: null,
     colors: { inner: '#dba236', mid: '#835012', outer: '#211204' },
+    exclude: ['telur'], // no boiled egg on this plate
     signature: { img: 'telur-mata', x: 0.46, y: 0.32, size: 0.3, rot: -12, depth: 1.25, front: true },
   },
 ];
 
 export function floatersFor(menu) {
-  return [...common, menu.signature].map((f) => ({ ...f, src: `${base}${f.img}.webp` }));
+  const ex = new Set(menu.exclude || []);
+  return [...common.filter((f) => !ex.has(f.img)), menu.signature].map((f) => ({ ...f, src: `${base}${f.img}.webp` }));
 }
 
 /** Ingredient images that exist (signature images of menus without a photo are skipped). */
