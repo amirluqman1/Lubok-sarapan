@@ -21,10 +21,10 @@ async function shoot(page, file, opts = {}) {
   const b = await launch();
   const report = {};
   for (const vp of [
-    { name: 'desktop', width: 1440, height: 900, mobile: false },
-    { name: 'mobile', width: 390, height: 844, mobile: true },
+    { name: 'desktop', width: 1440, height: 900, mobile: false, query: '?still&q=high' },
+    { name: 'mobile', width: 390, height: 844, mobile: true, query: '?still&q=medium' },
   ]) {
-    const { page, logs } = await openPage(b, { ...vp, query: '?still' });
+    const { page, logs } = await openPage(b, vp);
     const start = await assemblyStart(page);
     const len = await page.evaluate(() => window.__st.assembly.end - window.__st.assembly.start);
     const go = async (p, settle = 1200) => { await page.evaluate((y) => window.scrollTo(0, y), Math.round(start + p * len)); await page.waitForTimeout(settle); };

@@ -46,9 +46,9 @@ function anchovyGeometry(curl, sbend, noise, tier) {
   // fairly even body, narrow caudal peduncle, blunt head
   const depth = (t) => {
     const tail = Math.min(1, t / 0.2); const head = t > 0.9 ? Math.sqrt(Math.max(0, 1 - ((t - 0.9) / 0.1) ** 2)) : 1;
-    return 0.019 * (0.35 + 0.65 * Math.sqrt(tail)) * (1 + 0.15 * Math.sin(Math.PI * t)) * head + 0.001;
+    return 0.0155 * (0.35 + 0.65 * Math.sqrt(tail)) * (1 + 0.15 * Math.sin(Math.PI * t)) * head + 0.001;
   };
-  const cBelly = new THREE.Color(0xcf9346), cBack = new THREE.Color(0x8a5320), cHead = new THREE.Color(0x3f210a), cEye = new THREE.Color(0x140904), c = new THREE.Color();
+  const cBelly = new THREE.Color(0xb7772e), cBack = new THREE.Color(0x5a300f), cHead = new THREE.Color(0x3f210a), cEye = new THREE.Color(0x140904), c = new THREE.Color();
   for (let i = 0; i <= nT; i++) {
     const t = i / nT;
     const [x, z] = spine(t);
@@ -128,7 +128,7 @@ export function createPile({ quality }) {
   const field = new HeightField(PILE.x, PILE.z, 0.7, 72);
 
   const anchovyMat = new THREE.MeshPhysicalMaterial({
-    vertexColors: true, roughness: 0.42, clearcoat: 0.45, clearcoatRoughness: 0.3, side: THREE.DoubleSide,
+    vertexColors: true, roughness: 0.5, clearcoat: 0.45, clearcoatRoughness: 0.3, side: THREE.DoubleSide,
   });
   const peanutMat = new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: 0.52, clearcoat: 0.28, clearcoatRoughness: 0.35, bumpMap: null });
 
@@ -145,7 +145,7 @@ export function createPile({ quality }) {
       let best = null;
       const gx = centre[0] + gauss(rng) * sigma, gz = centre[1] + gauss(rng) * sigma;
       const tries = kind === 'a' ? 7 : 12;
-      const sc = kind === 'a' ? range(rng, 0.78, 1.1) : range(rng, 0.76, 0.92);
+      const sc = kind === 'a' ? range(rng, 0.78, 1.1) : range(rng, 0.68, 0.82);
       const rad = kind === 'a' ? 0.022 * sc : 0.027 * sc;
       const vr = kind === 'a' ? 0.0145 * sc : v.halfH * sc;
       for (let t = 0; t < tries; t++) {

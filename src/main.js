@@ -133,7 +133,7 @@ async function main() {
     const portrait = innerWidth / vh < 0.85;
     exp.setFraming(portrait
       ? { ox: 0, oy: lerp(lerp(0.11, 0.06, exp.hero) * (1 - r) + 0.04 * r, 0.0, show) }
-      : { ox: lerp(lerp(0.13, 0.17, exp.hero), 0, Math.max(show, 0)), oy: 0 });
+      : { ox: lerp(lerp(lerp(0.13, 0.21, r), 0.17, exp.hero), 0, Math.max(show, 0)), oy: 0 });
   });
 
   window.__st = { assembly: assemblyST };

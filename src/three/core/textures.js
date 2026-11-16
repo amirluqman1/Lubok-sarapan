@@ -31,9 +31,9 @@ export function woodTextures(noise, size = 1024) {
     for (let x = 0; x < size; x++) {
       const u = x / size;
       const g = fbm(noise, u * 2.2 + plank * 7.3, v * 26, plank * 3.1, 4);
-      const ring = 0.5 + 0.5 * Math.sin(v * 520 + g * 14 + noise(u * 1.3, plank * 5, 0.5) * 9);
+      const ring = 0.5 + 0.5 * Math.sin(v * 300 + g * 10 + noise(u * 1.1, plank * 5, 0.5) * 7);
       const fine = noise(u * 90, v * 900, plank) * 0.5 + 0.5;
-      let t = 0.42 * ring * ring + 0.38 * (g * 0.5 + 0.5) + 0.2 * fine;
+      let t = 0.4 * ring * ring + 0.48 * (g * 0.5 + 0.5) + 0.12 * fine;
       const plankTone = 0.85 + 0.3 * (((plank * 9301 + 49297) % 233280) / 233280);
       const edge = smoothstep(0, 0.012, pv) * smoothstep(1, 0.988, pv);
       let R = (26 + 40 * t) * plankTone, G = (16 + 24 * t) * plankTone, B = (10 + 13 * t) * plankTone;
@@ -108,7 +108,7 @@ export function leafTextures(noise, rng, size = 1024) {
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       const u = x / size, v = y / size;
-      const n = fbm(noise, u * 3, v * 3, 7.7, 4);
+      const n = 0.5 * fbm(noise, u * 3, v * 3, 7.7, 4);
       const streak = noise(u * 2, v * 140, 3.3) * 0.5 + 0.5;
       const yellow = smoothstep(0.25, 0.7, fbm(noise, u * 1.6 + 4, v * 1.6, 1.9, 3));
       const vein = veinStrength[y] * (0.75 + 0.25 * noise(u * 30, v * 4, 0));

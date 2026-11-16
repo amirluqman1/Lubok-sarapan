@@ -57,7 +57,7 @@ export function createSambal({ quality, textures }) {
     const j = k === 0 ? 0 : (k - 1) % NS;
     const r = rho[k] * edgeR[j];
     const x = S.dx + Math.cos(theta[k]) * r, z = S.dz + Math.sin(theta[k]) * r;
-    const l = fbm(noise, x * 13, z * 13, 0.5, 4);
+    const l = fbm(noise, x * 16, z * 16, 0.5, 4);
     lump[k] = l;
     const speck = noise(x * 60, z * 60, 7.3);
     c.copy(mid).lerp(deep, clamp(0.5 + l * 0.9, 0, 1));
@@ -76,11 +76,11 @@ export function createSambal({ quality, textures }) {
 
   const mat = new THREE.MeshPhysicalMaterial({
     vertexColors: true,
-    roughness: 0.42,
+    roughness: 0.5,
     bumpMap: textures.bumpCoarse,
     bumpScale: 2.2,
-    clearcoat: 1,
-    clearcoatRoughness: 0.14,
+    clearcoat: 0.85,
+    clearcoatRoughness: 0.2,
     clearcoatNormalMap: null,
   });
   const mesh = new THREE.Mesh(geo, mat);
@@ -130,6 +130,8 @@ export function createSambal({ quality, textures }) {
   const profileFinal = (r) => Math.pow(Math.max(0, 1 - Math.pow(r, 5)), 0.45);
   const profileDollop = (r) => Math.sqrt(Math.max(0, 1 - r * r));
   const T0 = 0.032;
+  // fine chunky texture of ground chilli / shallots
+  const l2 = (rh, th) => noise(Math.cos(th) * rh * 30, Math.sin(th) * rh * 30, 5.5);
   const edgeAt = (th) => {
     const f = ((th / (Math.PI * 2)) % 1 + 1) % 1 * NS;
     const j0 = Math.floor(f) % NS, j1 = (j0 + 1) % NS;
@@ -140,7 +142,7 @@ export function createSambal({ quality, textures }) {
     const x = S.dx + Math.cos(th) * r, z = S.dz + Math.sin(th) * r;
     const w = smoothstep(0.3, 1, spread);
     const prof = lerp(profileDollop(rh), profileFinal(rh), w);
-    const thick = T0 * Math.min(1 / (spread * spread), 4.2) * prof * (1 + 0.4 * l * prof);
+    const thick = T0 * Math.min(1 / (spread * spread), 4.2) * prof * (1 + 0.85 * l * prof) + 0.004 * prof * Math.max(0, l2(rh, th));
     out.set(x, riceTopY(x, z) + thick + lift, z);
     return thick;
   }

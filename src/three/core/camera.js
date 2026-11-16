@@ -47,7 +47,9 @@ export function createCameraRig() {
     // portrait screens: fit to width; landscape: fit to height (with elevation foreshortening)
     const fore = lerp(0.62, 1, Math.sin(pose.el));
     const half = Math.min(vf / 2 / Math.max(0.55, fore), hf / 2);
-    const dist = (FIT_RADIUS * pose.fit) / Math.sin(half);
+    // portrait phones: keep (almost) the whole plate inside the narrow width
+    const fit = camera.aspect < 1 ? lerp(pose.fit, 1.02, 0.75) : pose.fit;
+    const dist = (FIT_RADIUS * fit) / Math.sin(half);
     target.set(pose.tx || 0, pose.ty, pose.tz || 0);
     camera.position.set(
       target.x + Math.sin(pose.az) * Math.cos(pose.el) * dist,

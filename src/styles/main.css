@@ -96,7 +96,8 @@ p { margin: 0 0 1em; }
 
 /* ---------- immersive sections (transparent, the fixed canvas shows through) */
 main { position: relative; z-index: 2; }
-.hero, .assembly, .showcase { position: relative; pointer-events: none; }
+.hero, .assembly, .showcase { position: relative; pointer-events: none; -webkit-user-select: none; user-select: none; }
+.stage { -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
 .hero a, .hero button, .assembly a, .assembly button, .showcase a, .showcase button { pointer-events: auto; }
 
 .hero { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; padding: calc(var(--nav-h) + 18px) var(--gutter) 32px; }

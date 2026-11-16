@@ -8,6 +8,7 @@ async function openPage(browser, { width = 1280, height = 800, mobile = false, q
     ? { viewport: { width, height }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36' }
     : { viewport: { width, height }, deviceScaleFactor: 1 });
   const page = await ctx.newPage();
+  page.setDefaultTimeout(240000);
   const logs = [];
   page.on('console', (m) => logs.push(`[${m.type()}] ${m.text()}`));
   page.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}`));
