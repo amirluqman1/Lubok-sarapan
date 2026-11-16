@@ -34,9 +34,9 @@ Promosi bertanda `example: true` memaparkan lencana **Contoh** sehingga diganti.
    `Network: http://192.168.x.x:5173` yang dipaparkan, di Chrome Android.
 2. **Satu fail:** `npm run build:single` → hantar `dist-single/index.html` ke telefon dan buka
    dengan Chrome (Fonts Google perlu internet; selebihnya luar talian).
-3. **Hosting statik** (pilihan anda, tidak dibuat automatik): folder `dist/` boleh dihoskan di mana-mana
-   hos statik. GitHub Pages untuk repo peribadi memerlukan pelan berbayar atau repo awam — ini
-   keputusan anda.
+3. **GitHub Pages (repo ini awam):** `.github/workflows/pages.yml` membina dan menerbitkan `dist/`
+   setiap kali ada push. Sekali sahaja: *Settings → Pages → Source: GitHub Actions*.
+   Alamat: https://amirluqman1.github.io/Lubok-sarapan/
 
 Semak di telefon: skrol perlahan ke atas/bawah dalam bahagian susunan, seret pinggan di bahagian
 "Pusing 360°", dan cuba pemilih **3D** (Auto/Rendah/Sederhana/Tinggi) di bar navigasi.
