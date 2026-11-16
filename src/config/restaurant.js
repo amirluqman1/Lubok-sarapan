@@ -7,6 +7,7 @@ export const restaurant = {
   name: 'Lubok Sarapan',
   fullName: 'Restoran Lubok Sarapan',
   shortTagline: 'Sedap Setiap Hari',
+  introLine: 'Sarapan sedap, setiap hari.', // ayat beranimasi di skrin pembukaan
   owner: 'RA World Resources',           // daripada logo
   registrationNo: '2025030610931 003705782-H', // sama seperti tertera pada logo
 

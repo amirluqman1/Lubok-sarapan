@@ -72,3 +72,11 @@ export function floatersFor(menu) {
 
 /** Ingredient images that exist (signature images of menus without a photo are skipped). */
 export const availableImages = new Set(['daun-pandan', 'cili', 'timun', 'kacang', 'ikan-bilis', 'telur', 'ayam', 'udang', 'paru', 'kerang', 'telur-mata', 'sotong']);
+
+// "Menu Lain" section below the hero. image: cut-out in public/img/hero/ (null = elegant text tile).
+// price: number in RM, or null to hide.
+export const otherMenus = [
+  { id: 'bakso', name: 'Bakso', desc: 'Bebola daging dalam kuah panas yang beraroma.', image: null, price: null },
+  { id: 'mee-kari', name: 'Mee Kari', desc: 'Mee dalam kuah kari pekat dan berempah.', image: null, price: null },
+  { id: 'roti-canai', name: 'Roti Canai', desc: 'Roti canai rangup di luar, lembut di dalam, dengan kuah.', image: null, price: null },
+];

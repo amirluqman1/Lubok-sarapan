@@ -1,7 +1,7 @@
 import './styles/main.css';
 import { gsap } from 'gsap';
 import { restaurant as R } from './config/restaurant.js';
-import { menus, floatersFor, availableImages } from './config/menu.js';
+import { menus, floatersFor, availableImages, otherMenus } from './config/menu.js';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
@@ -9,13 +9,26 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 // ---------- config-driven bits
-$$('[data-cfg="name"]').forEach((el) => { el.textContent = R.name; });
-function orderHref(menu) {
-  if (!R.whatsapp) return null;
-  const txt = `Salam ${R.name}, saya nak order ${menu.kicker} ${menu.line1} ${menu.line2}.`;
-  return `https://wa.me/${R.whatsapp}?text=${encodeURIComponent(txt)}`;
-}
-$$('[aria-disabled="true"]').forEach((a) => a.addEventListener('click', (e) => e.preventDefault()));
+$$('[data-cfg]').forEach((el) => { if (R[el.dataset.cfg]) el.textContent = R[el.dataset.cfg]; });
+$('#foot-copy').textContent = `© ${new Date().getFullYear()} ${R.fullName || R.name}`;
+const price = (p) => (typeof p === 'number' ? `${R.currency} ${p.toFixed(2)}` : '');
+
+// ---------- "Menu Lain" grid
+$('#more-grid').innerHTML = otherMenus.map((m, i) => `
+  <article class="dish${m.image ? '' : ' dish--text'}" style="--i:${i}">
+    <div class="dish__media">${m.image
+      ? `<img src="${esc(m.image)}" alt="${esc(m.name)}" loading="lazy" decoding="async" />`
+      : `<span class="dish__mono" aria-hidden="true">${esc(m.name)}</span>`}</div>
+    <div class="dish__body">
+      <h3 class="dish__name">${esc(m.name)}</h3>
+      <p class="dish__desc">${esc(m.desc)}</p>
+      ${price(m.price) ? `<p class="dish__price">${price(m.price)}</p>` : ''}
+    </div>
+  </article>`).join('');
+const dishObs = new IntersectionObserver((entries) => entries.forEach((e) => {
+  if (e.isIntersecting) { e.target.classList.add('is-in'); dishObs.unobserve(e.target); }
+}), { threshold: 0.2 });
+$$('.dish').forEach((d) => dishObs.observe(d));
 
 // ---------- menu cards
 const cardsEl = $('#cards');
@@ -108,13 +121,8 @@ function setCopy(m) {
   $('#line1').textContent = m.line1;
   $('#line2').textContent = m.line2;
   $('#desc').textContent = m.desc;
-  $('#price').textContent = typeof m.price === 'number' ? `${R.currency} ${m.price.toFixed(2)}` : '';
+  $('#price').textContent = price(m.price);
   plateImg.alt = `${m.kicker} ${m.line1} ${m.line2}`;
-  const href = orderHref(m);
-  $$('[data-order]').forEach((a) => {
-    if (href) { a.href = href; a.target = '_blank'; a.rel = 'noopener'; a.removeAttribute('aria-disabled'); }
-    else { a.href = '#'; a.setAttribute('aria-disabled', 'true'); a.title = 'Nombor WhatsApp belum ditetapkan'; }
-  });
   $('#idx').textContent = String(current + 1).padStart(2, '0');
   $$('.card').forEach((c, i) => { c.classList.toggle('is-active', i === current); c.setAttribute('aria-selected', String(i === current)); });
   // keep the active card visible in the horizontal scroller (phones) without scrolling the page
@@ -188,8 +196,43 @@ stage.addEventListener('touchend', (e) => {
 
 window.addEventListener('resize', () => { measure(); floaters.forEach(place); });
 
-// ---------- intro
-gsap.from('.top > *', { y: -20, autoAlpha: 0, duration: reduced ? 0 : 0.8, ease: 'power3.out', stagger: 0.08 });
-gsap.from('.switch, .copy__chips, .copy__cta', { y: 30, autoAlpha: 0, duration: reduced ? 0 : 1, ease: 'power3.out', delay: 0.5, stagger: 0.1 });
-show(0);
+// ---------- 1. intro screen: logo pops in, then the sentence rises in word by word
+const line = $('#intro-line');
+// break after commas so the sentence reads as balanced lines ("Sarapan sedap, / setiap hari.")
+line.innerHTML = (R.introLine || R.shortTagline).split(/(?<=,)\s+/).map((part) =>
+  part.split(' ').map((w) => `<span class="w"><span class="w__in">${esc(w)}</span></span>`).join(' ')).join('<br />');
+const D = reduced ? 0 : 1;
+gsap.timeline({ delay: 0.15 * D })
+  .from('.intro__glow', { scale: 0.4, autoAlpha: 0, duration: 1.4 * D, ease: 'power2.out' }, 0)
+  .from('#intro-logo', { scale: 0.4, rotation: -18, autoAlpha: 0, duration: 1.1 * D, ease: 'back.out(1.7)' }, 0.1)
+  .from('.w__in', { yPercent: 115, rotation: 6, duration: 0.8 * D, ease: 'expo.out', stagger: 0.09 * D }, 0.75)
+  .from('.intro__cue', { y: 16, autoAlpha: 0, duration: 0.8 * D, ease: 'power2.out' }, 1.5);
+if (!reduced) gsap.to('#intro-logo', { y: -10, duration: 2.6, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 1.3 });
+
+// header: hidden on the intro, slides in once the visitor scrolls past it
+const topBar = $('#top');
+const introObs = new IntersectionObserver(([e]) => {
+  topBar.classList.toggle('is-on', !e.isIntersecting || e.intersectionRatio < 0.35);
+}, { threshold: [0, 0.35, 0.6] });
+introObs.observe($('#intro'));
+
+// active nav pill follows the section in view
+const navObs = new IntersectionObserver((entries) => entries.forEach((e) => {
+  if (e.isIntersecting) $$('.pill__item').forEach((a) => a.classList.toggle('is-active', a.dataset.nav === e.target.id));
+}), { threshold: 0.45 });
+navObs.observe($('#hero'));
+navObs.observe($('#menu-lain'));
+
+// ---------- 2. hero starts when it scrolls into view
+gsap.set('.copy .word, .copy__desc, .copy__kicker, .switch, .copy__chips', { autoAlpha: 0 });
+gsap.set(plateImg, { autoAlpha: 0 });
+let heroStarted = false;
+const heroObs = new IntersectionObserver(([e]) => {
+  if (!e.isIntersecting || heroStarted) return;
+  heroStarted = true;
+  heroObs.disconnect();
+  show(0);
+  gsap.fromTo('.switch, .copy__chips', { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1 * D, ease: 'power3.out', delay: 0.5 * D, stagger: 0.1 * D });
+}, { threshold: 0.3 });
+heroObs.observe($('#hero'));
 window.__hero = { show, get current() { return current; }, get floaters() { return floaters.length; } };

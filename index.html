@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#1a0904" />
   <title>Restoran Lubok Sarapan — Sedap Setiap Hari</title>
-  <meta name="description" content="Nasi lemak — nasi santan, sambal, telur, timun, ikan bilis, kacang dan lauk pilihan." />
-  <link rel="preload" as="image" href="img/hero/hidangan-ayam.webp" />
+  <meta name="description" content="Menu Restoran Lubok Sarapan: nasi lemak dengan pelbagai lauk, dan menu sarapan lain." />
+  <link rel="preload" as="image" href="img/hero/logo.webp" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,900;1,9..144,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -17,19 +17,24 @@
   <div class="bg" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
 
-  <header class="top">
-    <a class="brand" href="#" aria-label="Restoran Lubok Sarapan — laman utama"><img class="brand__logo" src="img/hero/logo.webp" alt="Restoran Lubok Sarapan" width="580" height="581" /></a>
+  <header class="top" id="top">
+    <a class="brand" href="#intro" aria-label="Restoran Lubok Sarapan — ke atas"><img class="brand__logo" src="img/hero/logo.webp" alt="Restoran Lubok Sarapan" width="580" height="581" /></a>
     <nav class="pill" aria-label="Navigasi utama">
-      <a class="pill__item is-active" href="#">Utama</a>
-      <a class="pill__item" href="#" aria-disabled="true" title="Akan datang">Menu</a>
-      <a class="pill__item" href="#" aria-disabled="true" title="Akan datang">Kisah</a>
-      <a class="pill__item" href="#" aria-disabled="true" title="Akan datang">Lokasi</a>
+      <a class="pill__item" href="#hero" data-nav="hero">Nasi Lemak</a>
+      <a class="pill__item" href="#menu-lain" data-nav="menu-lain">Menu Lain</a>
     </nav>
-    <a class="top__order" data-order href="#">Order</a>
   </header>
 
+  <!-- 1. INTRO: logo + one animated line -->
+  <section class="intro" id="intro" aria-label="Restoran Lubok Sarapan">
+    <div class="intro__glow" aria-hidden="true"></div>
+    <img class="intro__logo" id="intro-logo" src="img/hero/logo.webp" alt="Restoran Lubok Sarapan" width="580" height="581" />
+    <p class="intro__line" id="intro-line"></p>
+    <a class="intro__cue" href="#hero"><span class="intro__cue-line"></span>Leret ke bawah</a>
+  </section>
+
+  <!-- 2. HERO: nasi lemak menu switcher -->
   <main class="hero" id="hero">
-    <!-- copy (left) -->
     <section class="copy" aria-live="polite">
       <p class="copy__kicker" id="kicker">Nasi Lemak</p>
       <h1 class="copy__title">
@@ -37,16 +42,12 @@
         <span class="line"><span class="word" id="line2">Goreng</span></span>
       </h1>
       <p class="copy__desc" id="desc"></p>
-      <div class="copy__cta">
-        <a class="cta" data-order href="#">Order Sekarang <span class="cta__plus">+</span></a>
-        <p class="copy__price" id="price"></p>
-      </div>
+      <p class="copy__price" id="price"></p>
       <ul class="copy__chips" aria-label="Dalam pinggan">
         <li>Nasi santan</li><li>Sambal</li><li>Telur</li><li>Timun</li><li>Ikan bilis</li><li>Kacang</li>
       </ul>
     </section>
 
-    <!-- stage (centre) -->
     <section class="stage" id="stage" aria-label="Hidangan">
       <div class="layer layer--back" id="layer-back" aria-hidden="true"></div>
       <div class="plate" id="plate">
@@ -56,7 +57,6 @@
       <div class="layer layer--front" id="layer-front" aria-hidden="true"></div>
     </section>
 
-    <!-- menu switcher (right) -->
     <aside class="switch" aria-label="Pilih menu">
       <p class="switch__tag"><span class="outline">Pedas.</span> Lemak.<br />Wangi.</p>
       <div class="cards" id="cards" role="listbox" aria-label="Menu nasi lemak"></div>
@@ -67,6 +67,22 @@
       </div>
     </aside>
   </main>
+
+  <!-- 3. OTHER MENUS -->
+  <section class="more" id="menu-lain" aria-labelledby="more-title">
+    <header class="more__head">
+      <p class="more__kicker">Selain nasi lemak</p>
+      <h2 class="more__title" id="more-title"><span class="outline">Menu</span> Lain</h2>
+    </header>
+    <div class="more__grid" id="more-grid"></div>
+  </section>
+
+  <footer class="foot">
+    <img class="foot__logo" src="img/hero/logo.webp" alt="" width="580" height="581" loading="lazy" />
+    <p class="foot__name" data-cfg="fullName">Restoran Lubok Sarapan</p>
+    <p class="foot__tag" data-cfg="shortTagline">Sedap Setiap Hari</p>
+    <p class="foot__copy" id="foot-copy"></p>
+  </footer>
 
   <script type="module" src="/src/main.js"></script>
 </body>

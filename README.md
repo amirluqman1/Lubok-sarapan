@@ -1,6 +1,6 @@
 # Nasi Lemak — laman web restoran
 
-Laman web restoran nasi lemak (mobile-first). **Fasa 1 (sekarang): hero produk.**
+Laman paparan menu Restoran Lubok Sarapan (mobile-first): skrin pembukaan (logo + ayat beranimasi) → hero nasi lemak → Menu Lain.
 Pinggan nasi lemak di tengah dengan bahan terapung (ayam, telur, timun, ikan bilis, kacang, cili, pandan)
 yang bergerak ikut tetikus / kecondongan telefon, dan penukar menu: tukar menu → warna latar,
 pinggan, tajuk dan bahan terapung bertukar dengan animasi.
