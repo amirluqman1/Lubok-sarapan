@@ -69,4 +69,4 @@ export function floatersFor(menu) {
 }
 
 /** Ingredient images that exist (signature images of menus without a photo are skipped). */
-export const availableImages = new Set(['daun-pandan', 'cili', 'timun', 'kacang', 'ikan-bilis', 'telur', 'ayam']);
+export const availableImages = new Set(['daun-pandan', 'cili', 'timun', 'kacang', 'ikan-bilis', 'telur', 'ayam', 'udang', 'paru', 'kerang', 'telur-mata', 'sotong']);
