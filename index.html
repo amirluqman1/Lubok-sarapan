@@ -3,63 +3,68 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b0705" />
-  <title>Lubok Sarapan — Nasi Lemak Istimewa</title>
-  <meta name="description" content="Nasi lemak istimewa — lihat pinggan kosong diisi lapis demi lapis." />
-  <meta property="og:image" content="img/poster.webp" />
-  <link rel="preload" as="image" href="frames/hd/000.webp" />
+  <meta name="theme-color" content="#1a0904" />
+  <title>Lubok Sarapan — Nasi Lemak</title>
+  <meta name="description" content="Nasi lemak — nasi santan, sambal, telur, timun, ikan bilis, kacang dan lauk pilihan." />
+  <link rel="preload" as="image" href="img/hero/hidangan-ayam.webp" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,900;1,9..144,400&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,900;1,9..144,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23e8dcc6'/%3E%3Cpath d='M14 38c0-12 8-20 18-20s18 8 18 20z' fill='%23f6f0e2'/%3E%3Cpath d='M24 26c4-5 14-5 18 2-6 3-12 2-18-2z' fill='%23a3200d'/%3E%3C/svg%3E" />
 </head>
 <body>
-  <header class="nav">
-    <a class="nav__brand" href="#top" data-cfg="name">Lubok Sarapan</a>
-    <a class="nav__order" data-order href="#top">Order</a>
+  <div class="bg" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="top">
+    <a class="brand" href="#" data-cfg="name">Lubok Sarapan</a>
+    <nav class="pill" aria-label="Navigasi utama">
+      <a class="pill__item is-active" href="#">Utama</a>
+      <a class="pill__item" href="#" aria-disabled="true" title="Akan datang">Menu</a>
+      <a class="pill__item" href="#" aria-disabled="true" title="Akan datang">Kisah</a>
+      <a class="pill__item" href="#" aria-disabled="true" title="Akan datang">Lokasi</a>
+    </nav>
+    <a class="top__order" data-order href="#">Order</a>
   </header>
 
-  <main id="top">
-    <section id="film" class="film" aria-label="Nasi lemak diisi lapis demi lapis">
-      <canvas class="film__back" id="film-back" aria-hidden="true"></canvas>
-      <div class="film__dim" aria-hidden="true"></div>
-      <div class="film__frame" id="film-frame">
-        <canvas class="film__front" id="film-front" role="img" aria-label="Pinggan nasi lemak sedang diisi"></canvas>
-        <div class="film__fade" aria-hidden="true"></div>
+  <main class="hero" id="hero">
+    <!-- copy (left) -->
+    <section class="copy" aria-live="polite">
+      <p class="copy__kicker" id="kicker">Nasi Lemak</p>
+      <h1 class="copy__title">
+        <span class="line"><span class="word outline" id="line1">Ayam</span></span>
+        <span class="line"><span class="word" id="line2">Goreng</span></span>
+      </h1>
+      <p class="copy__desc" id="desc"></p>
+      <div class="copy__cta">
+        <a class="cta" data-order href="#">Order Sekarang <span class="cta__plus">+</span></a>
+        <p class="copy__price" id="price"></p>
       </div>
-      <div class="film__shade" aria-hidden="true"></div>
-      <div class="film__ghosts" id="ghosts" aria-hidden="true"></div>
-      <div class="film__grain" aria-hidden="true"></div>
-      <div class="film__bar film__bar--top" aria-hidden="true"></div>
-      <div class="film__bar film__bar--bot" aria-hidden="true"></div>
-
-      <!-- intro -->
-      <div class="intro" id="intro">
-        <p class="kicker" data-cfg="name">Lubok Sarapan</p>
-        <h1 class="intro__title"><span class="intro__l1">Nasi</span><span class="intro__l2">Lemak</span></h1>
-        <p class="intro__sub">Sebuah pinggan kosong. Tujuh lapisan rasa.</p>
-        <p class="intro__cue"><span></span>Skrol untuk mula</p>
-      </div>
-
-      <!-- chapters (one per ingredient) -->
-      <div class="chapters" id="chapters"></div>
-
-      <!-- finale -->
-      <div class="finale" id="finale">
-        <p class="kicker">Hidangan lengkap</p>
-        <h2 class="finale__title"><span>Nasi Lemak</span> <em>Istimewa</em></h2>
-        <p class="finale__tag">“Setiap suapan, penuh rasa.”</p>
-        <div class="finale__cta">
-          <a class="btn btn--accent" data-order href="#top">Order Sekarang</a>
-          <a class="btn btn--ghost" href="#top" id="replay">Tonton semula ↑</a>
-        </div>
-        <p class="finale__note" id="order-note"></p>
-      </div>
-
-      <!-- progress -->
-      <ol class="progress" id="progress" aria-hidden="true"></ol>
-      <p class="film__loading" id="film-loading" aria-hidden="true"></p>
+      <ul class="copy__chips" aria-label="Dalam pinggan">
+        <li>Nasi santan</li><li>Sambal</li><li>Telur</li><li>Timun</li><li>Ikan bilis</li><li>Kacang</li>
+      </ul>
     </section>
+
+    <!-- stage (centre) -->
+    <section class="stage" id="stage" aria-label="Hidangan">
+      <div class="layer layer--back" id="layer-back" aria-hidden="true"></div>
+      <div class="plate" id="plate">
+        <div class="plate__shadow" aria-hidden="true"></div>
+        <img class="plate__img" id="plate-img" alt="" src="img/hero/hidangan-ayam.webp" width="1500" height="1101" />
+      </div>
+      <div class="layer layer--front" id="layer-front" aria-hidden="true"></div>
+    </section>
+
+    <!-- menu switcher (right) -->
+    <aside class="switch" aria-label="Pilih menu">
+      <p class="switch__tag"><span class="outline">Pedas.</span> Lemak.<br />Wangi.</p>
+      <div class="cards" id="cards" role="listbox" aria-label="Menu nasi lemak"></div>
+      <div class="switch__nav">
+        <button class="arrow" id="prev" aria-label="Menu sebelum">←</button>
+        <p class="switch__count"><span id="idx">01</span> / <span id="total">06</span></p>
+        <button class="arrow" id="next" aria-label="Menu seterusnya">→</button>
+      </div>
+    </aside>
   </main>
 
   <script type="module" src="/src/main.js"></script>

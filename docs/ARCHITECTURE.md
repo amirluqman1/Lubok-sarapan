@@ -1,25 +1,27 @@
-# Architecture (Phase 1: scroll film only)
+# Architecture (Phase 1: product hero + menu switcher)
 
 ```
-index.html                 one pinned "film" section: intro → 7 ingredient chapters → finale
-media/nasi-lemak-assembly.mp4   source video (720×1280, 152 frames)
-scripts/extract-frames.sh  video → public/frames/{hd,lite}/NNN.webp + public/img/*.webp
+index.html                 header (glass pill nav), hero: copy · stage (plate + floating ingredients) · menu cards
+media/assets/*.jpg         original AI-generated photos on white (source of truth)
+scripts/cutout.py          ingredient photos → transparent, trimmed WebP (rembg, isnet-general-use)
+scripts/cutout_plate.py    plate photos (hidangan-*) → WebP via border flood-fill (keeps the pale plate rim intact)
+public/img/hero/*.webp     cut-outs used by the page
 src/
-  main.js                  builds captions from config; ONE GSAP master timeline scrubbed by ScrollTrigger
-  sequence/player.js       canvas image-sequence player (progressive loading, layout, blurred backdrop)
-  config/sequence.js       choreography: frame range, scroll weight, camera focus/zoom, captions per ingredient
-  config/restaurant.js     business data (name, WhatsApp, …) — menu/promo/location data kept for Phase 2
-  ui/site.js               Phase-2 sections (menu, story, promos, location, order) — not loaded yet
+  main.js                  menu switching (GSAP), floating ingredients (enter / idle bob / leave),
+                           pointer + device-tilt parallax, swipe & keyboard navigation
+  config/menu.js           menus (title, description, colours, plate image, signature ingredient)
+                           + floating-ingredient layout (x/y/size in plate widths, depth, blur, front/back)
+  config/restaurant.js     business data (name, WhatsApp, …)
+  ui/site.js               Phase-2 sections (menu list, story, promos, location) — not loaded yet
   styles/main.css
-tests/screenshots.cjs      Playwright: real scroll at each chapter, records frame + visible caption
+tests/hero.cjs             Playwright screenshots (390×844, 1440×900) + error / overflow check
 ```
 
-## The film timeline (all scroll-scrubbed, so reverse scrolling plays it backwards)
-| Part | What happens |
-|---|---|
-| Intro | Empty plate. Giant "Nasi / Lemak" splits apart, letterbox bars open. |
-| Chapter × 7 | Video frames for that ingredient; camera pushes in on where it lands; numbered caption + notes slide in, stay readable, slide out; a giant ghost word drifts behind (blend: overlay); progress segment fills. |
-| Finale | Last frames settle, camera pulls back (desktop: dish slides right), "Nasi Lemak Istimewa", tagline, Order Sekarang + Tonton semula. |
+## Adding a menu photo
+1. Save the photo as `media/assets/hidangan-<id>.jpg` (and the signature ingredient as `media/assets/<img>.jpg`).
+2. `python scripts/cutout_plate.py hidangan-<id>` and `python scripts/cutout.py <img>`.
+3. In `src/config/menu.js` set `plate: \`${base}hidangan-<id>.webp\`` and add `<img>` to `availableImages`.
 
-Each chapter's scroll length comes from its `weight`, not from how many video frames it has, so short
-moments (egg, peanuts) still give time to read.
+## Each floating ingredient = 3 nested transforms
+`.floater` (enter/leave fly-in) → `.floater__par` (parallax by depth) → `img` (idle bob + rotation).
+Far items are blurred once with CSS and only ever transformed, so they stay cheap on phones.

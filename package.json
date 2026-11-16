@@ -3,13 +3,12 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Laman web restoran nasi lemak dengan animasi video-scroll sinematik (GSAP ScrollTrigger)",
+  "description": "Laman web restoran nasi lemak: hero produk dengan bahan terapung dan penukar menu (GSAP)",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview --host",
-    "frames": "bash scripts/extract-frames.sh",
-    "screenshots": "node tests/screenshots.cjs"
+    "screenshots": "node tests/hero.cjs"
   },
   "dependencies": {
     "gsap": "^3.13.0"

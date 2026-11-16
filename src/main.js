@@ -1,134 +1,189 @@
 import './styles/main.css';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { restaurant as R } from './config/restaurant.js';
-import { sequence as SEQ } from './config/sequence.js';
-import { createPlayer, pickFrameSet } from './sequence/player.js';
-
-gsap.registerPlugin(ScrollTrigger);
-ScrollTrigger.config({ ignoreMobileResize: true });
+import { menus, floatersFor, availableImages } from './config/menu.js';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-// ---------- copy from config
+// ---------- config-driven bits
 $$('[data-cfg="name"]').forEach((el) => { el.textContent = R.name; });
-const waHref = R.whatsapp
-  ? `https://wa.me/${R.whatsapp}?text=${encodeURIComponent(`Salam ${R.name}, saya nak order nasi lemak.`)}`
-  : null;
-$$('[data-order]').forEach((a) => {
-  if (waHref) { a.href = waHref; a.target = '_blank'; a.rel = 'noopener'; }
-  else a.setAttribute('aria-disabled', 'true');
-});
-$('#order-note').textContent = waHref ? '' : 'Nombor WhatsApp belum ditetapkan.';
-$('#replay').addEventListener('click', (e) => {
-  e.preventDefault();
-  window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
-});
-
-const CH = SEQ.chapters;
-$('#chapters').innerHTML = CH.map((c, i) => `
-  <article class="chap ${i % 2 ? 'chap--r' : 'chap--l'}" data-i="${i}">
-    <p class="chap__num">${String(i + 1).padStart(2, '0')}<span>/${String(CH.length).padStart(2, '0')}</span></p>
-    <h2 class="chap__title">${esc(c.title)}</h2>
-    <p class="chap__line">${esc(c.line)}</p>
-    <ul class="chap__notes">${c.notes.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>
-  </article>`).join('');
-$('#ghosts').innerHTML = CH.map((c, i) => `<span class="ghost" data-i="${i}" style="--len:${c.ghost.length}">${esc(c.ghost)}</span>`).join('');
-$('#progress').innerHTML = CH.map((c) => `<li><span></span><em>${esc(c.title)}</em></li>`).join('');
-
-// ---------- player + camera push-in (transform on the frame canvas)
-const front = $('#film-front');
-const frameEl = $('#film-frame');
-const cam = { s: 1, fx: 0.5, fy: 0.55, ox: 0 }; // scale, focus (video coords 0–1), x-shift (fraction of viewport)
-let rect = { w: 1, h: 1 };
-function applyCam() {
-  const Fx = cam.fx * rect.w, Fy = cam.fy * rect.h;
-  front.style.transform = `translate(${(Fx * (1 - cam.s)).toFixed(2)}px, ${(Fy * (1 - cam.s)).toFixed(2)}px) scale(${cam.s.toFixed(4)})`;
-  frameEl.style.transform = cam.ox ? `translateX(${(cam.ox * window.innerWidth).toFixed(1)}px)` : '';
+function orderHref(menu) {
+  if (!R.whatsapp) return null;
+  const txt = `Salam ${R.name}, saya nak order ${menu.kicker} ${menu.line1} ${menu.line2}.`;
+  return `https://wa.me/${R.whatsapp}?text=${encodeURIComponent(txt)}`;
 }
-const player = createPlayer({
-  frame: frameEl,
-  front,
-  back: $('#film-back'),
-  cfg: SEQ,
-  setName: pickFrameSet(SEQ.sets),
-  onLoadProgress(p) {
-    const el = $('#film-loading');
-    el.textContent = p < 1 ? `Memuatkan ${Math.round(p * 100)}%` : '';
-    el.classList.toggle('is-on', p < 1);
-  },
-  onLayout(r) { rect = r; applyCam(); },
+$$('[aria-disabled="true"]').forEach((a) => a.addEventListener('click', (e) => e.preventDefault()));
+
+// ---------- menu cards
+const cardsEl = $('#cards');
+cardsEl.innerHTML = menus.map((m, i) => `
+  <button class="card${m.plate ? '' : ' is-soon'}" role="option" data-i="${i}" ${m.plate ? '' : 'aria-disabled="true"'}>
+    <span class="card__img">${m.plate ? `<img src="${m.plate}" alt="" loading="lazy" width="160" height="118" />` : '<span class="card__soon">Akan<br />datang</span>'}</span>
+    <span class="card__name">${esc(m.line1)} ${esc(m.line2)}</span>
+  </button>`).join('');
+$('#total').textContent = String(menus.length).padStart(2, '0');
+
+// ---------- floating ingredients
+const stage = $('#stage'), back = $('#layer-back'), front = $('#layer-front');
+const plate = $('#plate'), plateImg = $('#plate-img');
+let floaters = [];
+let W = 400; // plate width in px (layout unit for floaters)
+
+function measure() { W = plate.getBoundingClientRect().width / (gsap.getProperty(plate, 'scale') || 1); }
+
+function buildFloaters(menu) {
+  const list = floatersFor(menu).filter((f) => availableImages.has(f.img));
+  return list.map((f, k) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'floater';
+    const par = document.createElement('div'); // parallax layer
+    par.className = 'floater__par';
+    const img = document.createElement('img');  // bob + rotation layer
+    img.src = f.src; img.alt = ''; img.decoding = 'async';
+    if (f.blur) img.style.filter = `blur(${f.blur}px) brightness(.82)`;
+    par.appendChild(img);
+    wrap.appendChild(par);
+    (f.front ? front : back).appendChild(wrap);
+    const o = { el: wrap, par, img, f, k };
+    gsap.set(par, { x: px.x * f.depth * 26, y: px.y * f.depth * 26 });
+    place(o);
+    return o;
+  });
+}
+function place(o) {
+  const { f } = o;
+  const size = f.size * W;
+  Object.assign(o.el.style, { width: `${size}px`, height: `${size}px`, left: `calc(50% + ${f.x * W - size / 2}px)`, top: `calc(50% + ${f.y * W - size / 2}px)` });
+}
+
+function idle(o) {
+  if (reduced) return;
+  const amp = 6 + 10 * o.f.depth;
+  o.bob = gsap.to(o.img, { y: `+=${amp}`, rotation: `+=${(o.k % 2 ? -1 : 1) * (3 + 3 * o.f.depth)}`, duration: 2.6 + (o.k % 5) * 0.45, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: (o.k % 7) * 0.2 });
+}
+
+function enter(list, from = 0.35) {
+  list.forEach((o) => {
+    gsap.set(o.img, { rotation: o.f.rot });
+    gsap.fromTo(o.el, { x: -o.f.x * W * from, y: -o.f.y * W * from, scale: 0.3, autoAlpha: 0 },
+      { x: 0, y: 0, scale: 1, autoAlpha: 1, duration: reduced ? 0 : 1.1, ease: 'expo.out', delay: reduced ? 0 : 0.05 * o.k, onComplete: () => idle(o) });
+  });
+}
+function leave(list) {
+  return Promise.all(list.map((o) => new Promise((res) => {
+    o.bob?.kill();
+    gsap.to(o.el, { x: o.f.x * W * 0.6, y: o.f.y * W * 0.6, scale: 0.6, autoAlpha: 0, duration: reduced ? 0 : 0.45, ease: 'power2.in', delay: reduced ? 0 : 0.015 * o.k, onComplete: () => { o.el.remove(); res(); } });
+  })));
+}
+
+// ---------- parallax (pointer on desktop, device tilt on phones)
+const px = { x: 0, y: 0 };
+function parallaxTo(nx, ny) {
+  px.x = nx; px.y = ny;
+  if (reduced) return;
+  for (const o of floaters) {
+    const d = o.f.depth * 26;
+    gsap.to(o.par, { x: nx * d, y: ny * d, duration: 0.9, ease: 'power3.out', overwrite: 'auto' });
+  }
+  gsap.to(plate, { rotationY: nx * 6, rotationX: -ny * 6, x: nx * 6, y: ny * 6, duration: 1, ease: 'power3.out', overwrite: 'auto' });
+}
+window.addEventListener('pointermove', (e) => {
+  if (e.pointerType !== 'mouse') return;
+  parallaxTo((e.clientX / innerWidth) * 2 - 1, (e.clientY / innerHeight) * 2 - 1);
+}, { passive: true });
+window.addEventListener('deviceorientation', (e) => {
+  if (e.gamma == null) return;
+  parallaxTo(Math.max(-1, Math.min(1, e.gamma / 25)), Math.max(-1, Math.min(1, (e.beta - 45) / 25)));
+}, { passive: true });
+
+// ---------- switching menus
+let current = -1, busy = false;
+const root = document.documentElement;
+
+function setCopy(m) {
+  $('#kicker').textContent = m.kicker;
+  $('#line1').textContent = m.line1;
+  $('#line2').textContent = m.line2;
+  $('#desc').textContent = m.desc;
+  $('#price').textContent = typeof m.price === 'number' ? `${R.currency} ${m.price.toFixed(2)}` : '';
+  plateImg.alt = `${m.kicker} ${m.line1} ${m.line2}`;
+  const href = orderHref(m);
+  $$('[data-order]').forEach((a) => {
+    if (href) { a.href = href; a.target = '_blank'; a.rel = 'noopener'; a.removeAttribute('aria-disabled'); }
+    else { a.href = '#'; a.setAttribute('aria-disabled', 'true'); a.title = 'Nombor WhatsApp belum ditetapkan'; }
+  });
+  $('#idx').textContent = String(current + 1).padStart(2, '0');
+  $$('.card').forEach((c, i) => { c.classList.toggle('is-active', i === current); c.setAttribute('aria-selected', String(i === current)); });
+}
+
+async function show(i, dir = 1) {
+  const m = menus[i];
+  if (!m || !m.plate || busy || i === current) return;
+  busy = true;
+  const first = current < 0;
+  current = i;
+  const d = reduced ? 0 : 1;
+
+  gsap.to(root, { '--bg-inner': m.colors.inner, '--bg-mid': m.colors.mid, '--bg-outer': m.colors.outer, duration: 1.2 * d, ease: 'power2.inOut' });
+
+  if (!first) {
+    const old = floaters;
+    floaters = [];
+    await Promise.all([
+      leave(old),
+      gsap.to('.copy .word, .copy__desc, .copy__kicker', { yPercent: -110, autoAlpha: 0, duration: 0.35 * d, ease: 'power2.in', stagger: 0.04 * d }),
+      gsap.to(plateImg, { xPercent: -60 * dir, rotation: -25 * dir, autoAlpha: 0, scale: 0.85, duration: 0.5 * d, ease: 'power2.in' }),
+    ]);
+  }
+  setCopy(m);
+  if (plateImg.getAttribute('src') !== m.plate) {
+    plateImg.src = m.plate;
+    try { await plateImg.decode(); } catch { /* ignore */ }
+  }
+  measure();
+  floaters = buildFloaters(m);
+
+  gsap.fromTo(plateImg, { xPercent: 60 * dir, rotation: 25 * dir, autoAlpha: 0, scale: first ? 0.7 : 0.85 },
+    { xPercent: 0, rotation: 0, autoAlpha: 1, scale: 1, duration: (first ? 1.4 : 0.9) * d, ease: 'expo.out' });
+  gsap.fromTo('.copy .word, .copy__desc, .copy__kicker', { yPercent: 110, autoAlpha: 0 },
+    { yPercent: 0, autoAlpha: 1, duration: 0.7 * d, ease: 'expo.out', stagger: 0.06 * d, delay: 0.1 * d });
+  enter(floaters);
+  setTimeout(() => { busy = false; }, first ? 600 : 400);
+}
+
+function step(dir) {
+  let i = current;
+  for (let n = 0; n < menus.length; n++) {
+    i = (i + dir + menus.length) % menus.length;
+    if (menus[i].plate) return show(i, dir);
+  }
+}
+cardsEl.addEventListener('click', (e) => {
+  const c = e.target.closest('.card');
+  if (!c || c.classList.contains('is-soon')) return;
+  const i = +c.dataset.i;
+  show(i, i > current ? 1 : -1);
 });
-window.__seq = player; // automated tests
+$('#prev').addEventListener('click', () => step(-1));
+$('#next').addEventListener('click', () => step(1));
+window.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') step(1); if (e.key === 'ArrowLeft') step(-1); });
 
-// ---------- master timeline (scrubbed by scroll → fully reversible)
-const film = { frame: 0 };
-const tl = gsap.timeline({
-  paused: true,
-  defaults: { ease: 'none' },
-  onUpdate() { player.drawHD(film.frame); applyCam(); },
-});
-const easeOut = 'power2.out', easeIn = 'power2.in';
-const prog = $$('#progress li');
+// swipe on the stage (phones)
+let sx = null;
+stage.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; }, { passive: true });
+stage.addEventListener('touchend', (e) => {
+  if (sx == null) return;
+  const dx = e.changedTouches[0].clientX - sx; sx = null;
+  if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1);
+}, { passive: true });
 
-// intro: hold on the empty plate while the title splits away and the letterbox opens
-tl.to('.intro__l1', { xPercent: -22, autoAlpha: 0, duration: 0.7, ease: easeIn }, 0.25)
-  .to('.intro__l2', { xPercent: 22, autoAlpha: 0, duration: 0.7, ease: easeIn }, 0.3)
-  .to('.intro__sub, .intro__cue, #intro .kicker', { autoAlpha: 0, y: -20, duration: 0.4 }, 0.2)
-  .to('.film__bar', { scaleY: 0, duration: 0.8, ease: 'power2.inOut' }, 0.2)
-  .to('.film__shade', { opacity: 0.6, duration: 0.8 }, 0.2)
-  .fromTo('#progress', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 }, 0.7);
-let t = SEQ.intro.weight;
+window.addEventListener('resize', () => { measure(); floaters.forEach(place); });
 
-CH.forEach((c, i) => {
-  const d = c.weight;
-  const chap = `.chap[data-i="${i}"]`, ghost = `.ghost[data-i="${i}"]`;
-  // video frames for this ingredient
-  tl.fromTo(film, { frame: c.from }, { frame: c.to, duration: d, immediateRender: false }, t);
-  // camera pushes in on the ingredient as it lands, then eases back
-  tl.to(cam, { s: c.zoom, fx: c.focus[0], fy: c.focus[1], duration: d * 0.55, ease: 'sine.inOut' }, t)
-    .to(cam, { s: 1.02, duration: d * 0.45, ease: 'sine.inOut' }, t + d * 0.55);
-  // caption: in → readable hold → out
-  tl.fromTo(chap, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: d * 0.18, ease: easeOut, immediateRender: false }, t + d * 0.04)
-    .fromTo(`${chap} .chap__notes li`, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, stagger: d * 0.04, duration: d * 0.1, ease: easeOut, immediateRender: false }, t + d * 0.16)
-    .to(chap, { autoAlpha: 0, y: -30, duration: d * 0.14, ease: easeIn }, t + d * 0.86);
-  // giant ghost word drifting behind the caption
-  tl.fromTo(ghost, { autoAlpha: 0, xPercent: i % 2 ? 5 : -5 }, { autoAlpha: 1, xPercent: 0, duration: d * 0.25, ease: easeOut, immediateRender: false }, t)
-    .to(ghost, { xPercent: i % 2 ? -4 : 4, duration: d * 0.6 }, t + d * 0.25)
-    .to(ghost, { autoAlpha: 0, duration: d * 0.15 }, t + d * 0.85);
-  // progress marker fills across the chapter
-  tl.fromTo(prog[i], { '--fill': 0 }, { '--fill': 1, duration: d, immediateRender: false }, t);
-  t += d;
-});
-
-// finale: last frames settle, camera pulls back, title + CTA
-const F = SEQ.finale;
-tl.fromTo(film, { frame: F.from }, { frame: F.to, duration: F.weight * 0.6, immediateRender: false }, t)
-  .to(cam, { s: 1, fx: 0.5, fy: 0.55, ox: matchMedia('(min-width: 900px) and (min-aspect-ratio: 4/5)').matches ? 0.2 : 0, duration: F.weight * 0.5, ease: 'sine.inOut' }, t)
-  .to('.film__shade', { opacity: 1, duration: F.weight * 0.4 }, t + F.weight * 0.2)
-  .to('#progress', { autoAlpha: 0, duration: F.weight * 0.2 }, t + F.weight * 0.2)
-  .fromTo('.finale .kicker, .finale__title span, .finale__title em', { autoAlpha: 0, y: 50 },
-    { autoAlpha: 1, y: 0, stagger: 0.12, duration: F.weight * 0.3, ease: easeOut, immediateRender: false }, t + F.weight * 0.25)
-  .fromTo('.finale__tag, .finale__cta, .finale__note', { autoAlpha: 0, y: 20 },
-    { autoAlpha: 1, y: 0, stagger: 0.08, duration: F.weight * 0.25, ease: easeOut, immediateRender: false }, t + F.weight * 0.5);
-t += F.weight;
-
-// initial (unscrolled) state
-gsap.set('.chap, .ghost, .finale .kicker, .finale__title span, .finale__title em, .finale__tag, .finale__cta, .finale__note', { autoAlpha: 0 });
-
-const st = ScrollTrigger.create({
-  trigger: '#film',
-  start: 'top top',
-  end: () => `+=${Math.round(window.innerHeight * SEQ.vhPerUnit * t)}`,
-  pin: true,
-  anticipatePin: 1,
-  invalidateOnRefresh: true,
-  animation: tl,
-  scrub: reduced ? true : 0.9,
-});
-window.__st = st;
-window.__tl = tl;
-player.ready.then(() => document.documentElement.classList.add('seq-ready'));
+// ---------- intro
+gsap.from('.top > *', { y: -20, autoAlpha: 0, duration: reduced ? 0 : 0.8, ease: 'power3.out', stagger: 0.08 });
+gsap.from('.switch, .copy__chips, .copy__cta', { y: 30, autoAlpha: 0, duration: reduced ? 0 : 1, ease: 'power3.out', delay: 0.5, stagger: 0.1 });
+show(0);
+window.__hero = { show, get current() { return current; }, get floaters() { return floaters.length; } };
