@@ -4,8 +4,11 @@
 //  supaya tiada maklumat palsu (harga, alamat, nombor telefon) dipaparkan.
 // ─────────────────────────────────────────────────────────────────────────────
 export const restaurant = {
-  name: 'Lubok Sarapan',              // nama kedai (diambil daripada nama repo; tukar jika perlu)
-  shortTagline: 'Nasi lemak, dibina dengan teliti.',
+  name: 'Lubok Sarapan',
+  fullName: 'Restoran Lubok Sarapan',
+  shortTagline: 'Sedap Setiap Hari',
+  owner: 'RA World Resources',           // daripada logo
+  registrationNo: '2025030610931 003705782-H', // sama seperti tertera pada logo
 
   // Format antarabangsa tanpa '+' atau sengkang, cth: '60123456789'. Kosong = butang WhatsApp dimatikan.
   whatsapp: '',
