@@ -55,3 +55,31 @@ grant insert, update, delete on public.menu_items to authenticated;
 
 -- Verified 2026-11-17 (SQL role simulation): anonymous can read 9 items, cannot update, cannot read admins;
 -- an authenticated non-admin user changes 0 rows; sold_out_on = today → sold out, yesterday → available.
+
+-- ── Migration 2026-11-17 (b): categories + per-item options ─────────────────────────
+-- categories: nasi-lemak (hero only, in_list=false), roti (Pilihan kuah: dhal/kari/sambal),
+-- kuah, kuih (empty for now), minuman, lempeng. menu_items.category → FK categories(id).
+create table public.categories (
+  id text primary key check (id ~ '^[a-z0-9-]{1,40}$'),
+  name text not null check (length(name) between 1 and 60),
+  sort_order int not null default 0,
+  options_label text check (options_label is null or length(options_label) <= 40),
+  options text[] not null default '{}',
+  in_list boolean not null default true
+);
+alter table public.menu_items drop constraint menu_items_category_check;
+alter table public.menu_items add constraint menu_items_category_fk foreign key (category) references public.categories(id) on update cascade;
+alter table public.menu_items add column options text[] not null default '{}';   -- e.g. {Ais,Panas}
+alter table public.categories enable row level security;
+create policy categories_read_all on public.categories for select to anonymous, authenticated using (true);
+create policy categories_admin_write on public.categories for all to authenticated using ((select public.is_admin())) with check ((select public.is_admin()));
+grant select on public.categories to anonymous, authenticated;
+grant insert, update, delete on public.categories to authenticated;
+drop view public.menu_public;
+create view public.menu_public with (security_invoker = on) as
+  select m.id, m.category, m.name, m.description, m.price, m.image, m.options, m.sort_order, m.closed,
+    (m.sold_out_on is not null and m.sold_out_on >= (now() at time zone 'Asia/Kuala_Lumpur')::date) as sold_out_today,
+    m.updated_at
+  from public.menu_items m;
+grant select on public.menu_public to anonymous, authenticated;
+-- Data loaded: Nasi Lemak 6 · Roti Canai 12 · Kuah-Kuahan 9 · Kuih-Muih 0 · Minuman 15 · Lempeng 1 (43 items).
