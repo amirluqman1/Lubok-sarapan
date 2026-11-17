@@ -30,7 +30,8 @@ button { font: inherit; color: inherit; }
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 
 /* ---------- header */
-html { scroll-behavior: smooth; scroll-snap-type: y proximity; }
+/* mandatory + snap-stop: a fast swipe from the intro always stops on the hero before "Menu Lain" */
+html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
 .top { position: fixed; top: 0; left: 0; right: 0; z-index: 30; height: calc(var(--top-h) + env(safe-area-inset-top)); display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: env(safe-area-inset-top) var(--gutter) 0; transform: translateY(-110%); opacity: 0; transition: transform .6s cubic-bezier(.2, .8, .2, 1), opacity .4s;
   background: linear-gradient(to bottom, rgba(14, 5, 2, .97), rgba(14, 5, 2, .9)); box-shadow: 0 8px 24px rgba(0, 0, 0, .25); }
@@ -50,7 +51,7 @@ html { scroll-behavior: smooth; scroll-snap-type: y proximity; }
 
 /* ---------- 1. intro */
 .intro { position: relative; z-index: 2; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: clamp(18px, 4vh, 40px); padding: 6vh var(--gutter) 14vh; text-align: center; scroll-snap-align: start; overflow: hidden; }
+  gap: clamp(18px, 4vh, 40px); padding: 6vh var(--gutter) 14vh; text-align: center; scroll-snap-align: start; scroll-snap-stop: always; overflow: hidden; }
 .intro__glow { position: absolute; left: 50%; top: 44%; width: 120vmax; height: 120vmax; transform: translate(-50%, -50%); pointer-events: none;
   background: radial-gradient(circle, rgba(250, 186, 50, .38) 0%, rgba(232, 120, 30, .16) 26%, transparent 55%); }
 .intro__logo { position: relative; width: min(64vw, 42svh, 360px); height: auto; filter: drop-shadow(0 24px 40px rgba(0, 0, 0, .45)); }
@@ -63,7 +64,7 @@ html { scroll-behavior: smooth; scroll-snap-type: y proximity; }
 @keyframes cue { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
 
 /* ---------- hero grid */
-.hero { position: relative; z-index: 2; display: grid; grid-template-areas: "copy" "stage" "switch"; scroll-snap-align: start;
+.hero { position: relative; z-index: 2; display: grid; grid-template-areas: "copy" "stage" "switch"; scroll-snap-align: start; scroll-snap-stop: always;
   padding: calc(var(--top-h) + env(safe-area-inset-top)) var(--gutter) calc(18px + env(safe-area-inset-bottom)); gap: 4px; }
 @media (min-width: 1000px) {
   .hero { min-height: 100svh; grid-template-columns: minmax(300px, 1fr) minmax(0, 1.45fr) minmax(240px, .8fr);
@@ -131,7 +132,7 @@ html { scroll-behavior: smooth; scroll-snap-type: y proximity; }
 }
 
 /* ---------- 3. other menus */
-.more { position: relative; z-index: 2; padding: 12vh var(--gutter) 10vh;
+.more { position: relative; z-index: 2; padding: 12vh var(--gutter) 10vh; scroll-snap-align: start; scroll-snap-stop: always;
   background: linear-gradient(to bottom, transparent, rgba(10, 4, 2, .55) 18%, rgba(10, 4, 2, .75)); }
 .more__head { text-align: center; margin-bottom: 26px; }
 .more__status { margin: 12px 0 0; font-size: .78rem; color: var(--muted); }
@@ -183,7 +184,7 @@ html { scroll-behavior: smooth; scroll-snap-type: y proximity; }
 .more__title { margin: 0; font: 900 clamp(2.8rem, 12vw, 6.4rem) var(--font-display); line-height: .9; letter-spacing: -.025em; }
 
 /* ---------- footer */
-.foot { position: relative; z-index: 2; display: grid; justify-items: center; gap: 6px; text-align: center;
+.foot { position: relative; z-index: 2; scroll-snap-align: end; display: grid; justify-items: center; gap: 6px; text-align: center;
   padding: 48px var(--gutter) calc(36px + env(safe-area-inset-bottom)); background: rgba(8, 3, 1, .82); border-top: 1px solid var(--line); }
 .foot__logo { width: 84px; height: 84px; margin-bottom: 6px; }
 .foot__name { margin: 0; font: 900 1.3rem var(--font-display); }
