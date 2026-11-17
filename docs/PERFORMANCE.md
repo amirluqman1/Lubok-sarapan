@@ -1,3 +1,5 @@
+> ⚠️ Dokumen sejarah — kebanyakannya tentang versi lama (3D / filem skrol). Rujuk README.md untuk keadaan semasa.
+
 # Performance notes (Phase 1 hero)
 
 * JS ≈ 79 kB (31 kB gzip): GSAP + app. No WebGL, no video.

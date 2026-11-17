@@ -1,3 +1,5 @@
+> ⚠️ Dokumen sejarah — kebanyakannya tentang versi lama (3D / filem skrol). Rujuk README.md untuk keadaan semasa.
+
 # Visual audit
 
 | Version | Approach | Result |
