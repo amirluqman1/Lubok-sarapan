@@ -1,6 +1,5 @@
 // Hero menu switcher. Each menu: plate photo (cut out, public/img/hero/), title lines,
 // background colours and its floating ingredients.
-// `spin` (optional) = stacked-alpha video of the plate turning, played over the photo.
 // `plate: null` = photo not supplied yet → card shows "Akan datang" and cannot be selected.
 
 const base = 'img/hero/';
@@ -25,7 +24,6 @@ export const menus = [
     id: 'ayam', kicker: 'Nasi Lemak', line1: 'Ayam', line2: 'Goreng',
     desc: 'Ayam goreng rangup bersama nasi santan, sambal, telur rebus, timun, ikan bilis dan kacang.',
     plate: `${base}hidangan-ayam.webp`, price: null,
-    spin: 'video/hidangan-ayam-pusing.mp4', // pinggan berpusing (scripts/spin_plate.py); gambar di atas = sandaran
     colors: { inner: '#cf6a2c', mid: '#6e2a0f', outer: '#1a0904' },
     signature: { img: 'ayam', x: 0.4, y: 0.36, size: 0.34, rot: -24, depth: 1.25, front: true },
   },

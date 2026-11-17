@@ -94,12 +94,7 @@ html { scroll-behavior: smooth; scroll-snap-type: y proximity; }
 @media (min-width: 1000px) { .stage { height: min(78svh, 46vw); } }
 .plate { position: relative; z-index: 3; width: min(80vw, 54svh); perspective: 900px; transform-style: preserve-3d; }
 @media (min-width: 1000px) { .plate { width: min(36vw, 62svh); } }
-.plate__media { position: relative; filter: drop-shadow(0 30px 40px rgba(0, 0, 0, .45)); will-change: transform; }
-.plate__img { display: block; width: 100%; height: auto; transition: opacity .35s ease .15s; }
-/* spinning-plate video (src/hero/spin.js) drawn over the photo; photo stays as fallback */
-.plate__spin { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity .35s ease; }
-.plate__media.is-spinning .plate__spin { opacity: 1; }
-.plate__media.is-spinning .plate__img { opacity: 0; }
+.plate__img { width: 100%; height: auto; filter: drop-shadow(0 30px 40px rgba(0, 0, 0, .45)); will-change: transform; }
 .plate__shadow { position: absolute; left: 8%; right: 8%; bottom: -6%; height: 22%; border-radius: 50%;
   background: radial-gradient(closest-side, rgba(0, 0, 0, .55), transparent); filter: blur(6px); }
 .layer { position: absolute; inset: 0; pointer-events: none; }

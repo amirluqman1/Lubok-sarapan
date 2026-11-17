@@ -33,10 +33,7 @@ menanda menu *Habis hari ini* / *Tutup*. Tiada sistem order (sengaja dibuang).
 5. **Harga** (lajur `price` kosong untuk semua menu).
 6. **Gambar sebenar untuk menu lain** — pemilik akan hantar foto telefon sebenar (bukan AI). Papar sebagai foto penuh dalam kad, mampat ke WebP ~150–300 KB.
 7. Footer: no. pendaftaran `2025030610931 003705782-H` (RA World Resources) disimpan dalam `src/config/restaurant.js` tetapi **belum dipaparkan — tunggu pemilik sahkan**.
-8. Pinggan berpusing: **✅ Ayam Goreng sahaja** (video kedua pemilik, 17 Nov). Menu lain masih gambar statik —
-   jika pemilik hantar video serupa untuk menu lain: `scripts/spin_plate.py` + tambah `spin:` dalam `src/config/menu.js`.
-   Had: video asal lebih sempit dari pinggan, jadi ~10% tepi kiri/kanan rim ditampal dari gambar statik;
-   makanan yang betul-betul di tepi (timun/kacang kanan) kadang nampak terpotong lembut di situ.
+8. Ciri 360° pinggan berpusing: **ditangguhkan** (video AI yang dihantar "mencair" di tengah). Tidak wajib.
 
 ### Keputusan & citarasa pemilik (penting)
 - Bahasa: Bahasa Melayu santai; mahu penerangan jelas, berfasa, **terangkan dulu sebelum kerja besar**.
@@ -94,12 +91,6 @@ src/styles/main.css         gaya laman awam · src/admin/admin.css gaya panel
 src/ui/site.js              ⚠️ LAMA, tidak digunakan (kod fasa awal) — boleh dibuang
 media/assets/*.jpg          gambar asal dari pemilik (latar putih) — sumber
 public/img/hero/*.webp      potongan lutsinar yang digunakan laman
-src/hero/spin.js            pinggan berpusing: video "stacked alpha" (atas = warna, bawah = topeng) → kanvas WebGL
-                            di atas gambar pinggan; gagal/reduced-motion/data-saver → gambar statik kekal
-public/video/hidangan-*-pusing.{mp4,webm}  video pusing siap (MP4 H.264 utama, WebM VP9 sandaran)
-media/hidangan-ayam-pusing-sumber.mp4      video asal pemilik (kamera mengelilingi pinggan atas meja kayu)
-scripts/spin_plate.py       video asal → video pusing: cari elips pinggan setiap frame, stabilkan, buang latar,
-                            tampal rim yang terkeluar frame, gelung frame 1–138
 media/nasi-lemak-assembly.mp4  ⚠️ LAMA (filem skrol yang ditolak) — tidak digunakan
 scripts/cutout.py           bahan → WebP lutsinar (rembg, model isnet-general-use)
 scripts/cutout_plate.py     pinggan `hidangan-*` → WebP (flood-fill latar putih; rembg merosakkan rim pinggan)
@@ -115,9 +106,6 @@ db/schema.sql               skema + migrasi + nota ujian
 - **Pinggan menu nasi lemak:** `media/assets/hidangan-<id>.jpg` → `python scripts/cutout_plate.py hidangan-<id>`.
 - **Foto sebenar menu lain:** mampat ke `public/img/menu/<id>.webp` (~1200px, kualiti ~78), isi lajur `image` di DB
   (`img/menu/<id>.webp`); render sudah sokong `image` (thumbnail dalam senarai).
-- **Pinggan berpusing:** `python -m venv /tmp/cv && /tmp/cv/bin/pip install opencv-python-headless numpy scipy pillow`
-  → `/tmp/cv/bin/python scripts/spin_plate.py media/<video>.mp4 public/img/hero/hidangan-<id>.webp public/video/hidangan-<id>-pusing.mp4`
-  (pemalar `RIM_ADJ` / `LOOP` dalam skrip mungkin perlu dilaras untuk video lain; semak frame dalam folder kerja yang dicetak).
 - rembg: `python -m venv /tmp/rbg && /tmp/rbg/bin/pip install "rembg[cpu]"` (model dimuat turun dari GitHub, ~180 MB).
 
 ## Jalankan & uji
