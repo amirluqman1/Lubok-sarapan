@@ -83,3 +83,9 @@ create view public.menu_public with (security_invoker = on) as
   from public.menu_items m;
 grant select on public.menu_public to anonymous, authenticated;
 -- Data loaded: Nasi Lemak 6 · Roti Canai 12 · Kuah-Kuahan 9 · Kuih-Muih 0 · Minuman 15 · Lempeng 1 (43 items).
+
+-- ── 2026-11-17 (c) ─────────────────────────────────────────────────────────────────
+-- Category sarapan-ringan (Roti Bakar {Kaya,Butter,Jam,Coklat}, Bubur, Cereal).
+-- Neon Auth: email OTP verification required; sign-up DISABLED after the owner registered.
+-- is_admin() additionally requires neon_auth.user."emailVerified" = true.
+-- Owner account linked: admins.user_id set for bodobodoahh@gmail.com (verified, the only user).
