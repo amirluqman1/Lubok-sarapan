@@ -3,6 +3,7 @@ import { gsap } from 'gsap';
 import { restaurant as R } from './config/restaurant.js';
 import { menus, floatersFor, availableImages } from './config/menu.js';
 import { loadMenu, statusOf } from './data/menu-store.js';
+import { createSpin } from './hero/spin.js';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
@@ -85,7 +86,7 @@ $('#total').textContent = String(menus.length).padStart(2, '0');
 
 // ---------- floating ingredients
 const stage = $('#stage'), back = $('#layer-back'), front = $('#layer-front');
-const plate = $('#plate'), plateImg = $('#plate-img');
+const plate = $('#plate'), plateImg = $('#plate-img'), plateMedia = $('#plate-media');
 let floaters = [];
 let W = 400; // plate width in px (layout unit for floaters)
 
@@ -156,6 +157,26 @@ window.addEventListener('deviceorientation', (e) => {
   parallaxTo(Math.max(-1, Math.min(1, e.gamma / 25)), Math.max(-1, Math.min(1, (e.beta - 45) / 25)));
 }, { passive: true });
 
+// ---------- spinning plate video (only for menus with `spin`; skipped for reduced motion / data saver)
+const spins = new Map();
+let spinOn = null, heroVisible = true;
+const saveData = navigator.connection?.saveData;
+function setSpin(m) {
+  const want = !reduced && !saveData && m.spin ? m.spin : null;
+  if (spinOn && spinOn !== want) spins.get(spinOn)?.hide();
+  spinOn = want;
+  if (!want) return;
+  if (!spins.has(want)) spins.set(want, createSpin(plateMedia, want));
+  if (heroVisible && !document.hidden) spins.get(want)?.play();
+}
+function spinPlayPause() {
+  const s = spinOn && spins.get(spinOn);
+  if (!s) return;
+  if (heroVisible && !document.hidden) s.play(); else s.pause();
+}
+new IntersectionObserver(([e]) => { heroVisible = e.isIntersecting; spinPlayPause(); }).observe(plate);
+document.addEventListener('visibilitychange', spinPlayPause);
+
 // ---------- switching menus
 let current = -1, busy = false;
 const root = document.documentElement;
@@ -203,7 +224,7 @@ async function show(i, dir = 1) {
     await Promise.all([
       leave(old),
       gsap.to('.copy .word, .copy__desc, .copy__kicker', { yPercent: -110, autoAlpha: 0, duration: 0.35 * d, ease: 'power2.in', stagger: 0.04 * d }),
-      gsap.to(plateImg, { xPercent: -60 * dir, rotation: -25 * dir, autoAlpha: 0, scale: 0.85, duration: 0.5 * d, ease: 'power2.in' }),
+      gsap.to(plateMedia, { xPercent: -60 * dir, rotation: -25 * dir, autoAlpha: 0, scale: 0.85, duration: 0.5 * d, ease: 'power2.in' }),
     ]);
   }
   setCopy(m);
@@ -211,10 +232,11 @@ async function show(i, dir = 1) {
     plateImg.src = m.plate;
     try { await plateImg.decode(); } catch { /* ignore */ }
   }
+  setSpin(m);
   measure();
   floaters = buildFloaters(m);
 
-  gsap.fromTo(plateImg, { xPercent: 60 * dir, rotation: 25 * dir, autoAlpha: 0, scale: first ? 0.7 : 0.85 },
+  gsap.fromTo(plateMedia, { xPercent: 60 * dir, rotation: 25 * dir, autoAlpha: 0, scale: first ? 0.7 : 0.85 },
     { xPercent: 0, rotation: 0, autoAlpha: 1, scale: 1, duration: (first ? 1.4 : 0.9) * d, ease: 'expo.out' });
   gsap.fromTo('.copy .word, .copy__desc, .copy__kicker', { yPercent: 110, autoAlpha: 0 },
     { yPercent: 0, autoAlpha: 1, duration: 0.7 * d, ease: 'expo.out', stagger: 0.06 * d, delay: 0.1 * d });
@@ -279,7 +301,7 @@ navObs.observe($('#menu-lain'));
 
 // ---------- 2. hero starts when it scrolls into view
 gsap.set('.copy .word, .copy__desc, .copy__kicker, .switch, .copy__chips', { autoAlpha: 0 });
-gsap.set(plateImg, { autoAlpha: 0 });
+gsap.set(plateMedia, { autoAlpha: 0 });
 let heroStarted = false;
 const heroObs = new IntersectionObserver(([e]) => {
   if (!e.isIntersecting || heroStarted) return;
