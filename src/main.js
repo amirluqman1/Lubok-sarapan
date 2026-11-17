@@ -1,7 +1,8 @@
 import './styles/main.css';
 import { gsap } from 'gsap';
 import { restaurant as R } from './config/restaurant.js';
-import { menus, floatersFor, availableImages, otherMenus } from './config/menu.js';
+import { menus, floatersFor, availableImages } from './config/menu.js';
+import { loadMenu, statusOf } from './data/menu-store.js';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
@@ -11,24 +12,67 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&
 // ---------- config-driven bits
 $$('[data-cfg]').forEach((el) => { if (R[el.dataset.cfg]) el.textContent = R[el.dataset.cfg]; });
 $('#foot-copy').textContent = `© ${new Date().getFullYear()} ${R.fullName || R.name}`;
-const price = (p) => (typeof p === 'number' ? `${R.currency} ${p.toFixed(2)}` : '');
+const price = (p) => (p != null && p !== '' && !Number.isNaN(Number(p)) ? `${R.currency} ${Number(p).toFixed(2)}` : '');
+const STATUS_TEXT = { habis: 'Habis hari ini', tutup: 'Tidak tersedia' };
 
-// ---------- "Menu Lain" grid
-$('#more-grid').innerHTML = otherMenus.map((m, i) => `
-  <article class="dish${m.image ? '' : ' dish--text'}" style="--i:${i}">
-    <div class="dish__media">${m.image
-      ? `<img src="${esc(m.image)}" alt="${esc(m.name)}" loading="lazy" decoding="async" />`
-      : `<span class="dish__mono" aria-hidden="true">${esc(m.name)}</span>`}</div>
-    <div class="dish__body">
-      <h3 class="dish__name">${esc(m.name)}</h3>
-      <p class="dish__desc">${esc(m.desc)}</p>
-      ${price(m.price) ? `<p class="dish__price">${price(m.price)}</p>` : ''}
-    </div>
-  </article>`).join('');
-const dishObs = new IntersectionObserver((entries) => entries.forEach((e) => {
-  if (e.isIntersecting) { e.target.classList.add('is-in'); dishObs.unobserve(e.target); }
-}), { threshold: 0.2 });
-$$('.dish').forEach((d) => dishObs.observe(d));
+// ---------- live menu data (Neon) — statuses, prices, full "Menu Lain" list
+let menuData = null;
+
+function renderMenuLain(data) {
+  const cats = data.categories.filter((c) => c.in_list);
+  $('#more-nav').innerHTML = cats.map((c) => `<a class="more__chip" href="#cat-${esc(c.id)}">${esc(c.name)}</a>`).join('');
+  $('#more-grid').innerHTML = cats.map((c, ci) => {
+    const items = data.items.filter((i) => i.category === c.id);
+    // available first, sold-out / unavailable last
+    items.sort((a, b) => (statusOf(a) !== 'ada') - (statusOf(b) !== 'ada') || a.sort_order - b.sort_order);
+    const rows = items.map((i) => {
+      const st = statusOf(i);
+      return `
+        <li class="mi${st !== 'ada' ? ' mi--off' : ''}">
+          ${i.image ? `<img class="mi__img" src="${esc(i.image)}" alt="" loading="lazy" decoding="async" />` : ''}
+          <div class="mi__main">
+            <p class="mi__name">${esc(i.name)}${st !== 'ada' ? ` <span class="badge badge--${st}">${STATUS_TEXT[st]}</span>` : ''}</p>
+            ${i.description ? `<p class="mi__desc">${esc(i.description)}</p>` : ''}
+            ${i.options.length ? `<p class="mi__opts">${i.options.map((o) => `<span>${esc(o)}</span>`).join('')}</p>` : ''}
+          </div>
+          ${price(i.price) ? `<p class="mi__price">${price(i.price)}</p>` : ''}
+        </li>`;
+    }).join('');
+    return `
+      <article class="cat" id="cat-${esc(c.id)}" style="--i:${ci}">
+        <header class="cat__head">
+          <h3 class="cat__name">${esc(c.name)}</h3>
+          ${c.options?.length ? `<p class="cat__opts"><span class="cat__opts-label">${esc(c.options_label || 'Pilihan')}:</span> ${c.options.map((o) => `<span>${esc(o)}</span>`).join('')}</p>` : ''}
+        </header>
+        ${items.length ? `<ul class="cat__list">${rows}</ul>` : '<p class="cat__empty">Senarai akan dikemas kini.</p>'}
+      </article>`;
+  }).join('');
+  const obs = new IntersectionObserver((entries) => entries.forEach((e) => {
+    if (e.isIntersecting) { e.target.classList.add('is-in'); obs.unobserve(e.target); }
+  }), { threshold: 0.08 });
+  $$('.cat').forEach((d) => obs.observe(d));
+  $('#more-status').textContent = data.source === 'live' ? 'Status menu dikemas kini secara langsung.' : '';
+}
+
+function applyHeroStatus() {
+  if (!menuData) return;
+  $$('.card').forEach((c) => {
+    const st = statusOf(menuData.byId[menus[+c.dataset.i]?.id]);
+    c.classList.toggle('is-off', st !== 'ada');
+    let b = c.querySelector('.card__badge');
+    if (st !== 'ada') {
+      if (!b) { b = document.createElement('span'); b.className = 'card__badge'; c.querySelector('.card__img').appendChild(b); }
+      b.textContent = st === 'habis' ? 'Habis' : 'Tiada';
+    } else b?.remove();
+  });
+}
+
+loadMenu().then((data) => {
+  menuData = data;
+  renderMenuLain(data);
+  applyHeroStatus();
+  if (current >= 0) setStatus(menus[current]);
+});
 
 // ---------- menu cards
 const cardsEl = $('#cards');
@@ -121,7 +165,7 @@ function setCopy(m) {
   $('#line1').textContent = m.line1;
   $('#line2').textContent = m.line2;
   $('#desc').textContent = m.desc;
-  $('#price').textContent = price(m.price);
+  setStatus(m);
   plateImg.alt = `${m.kicker} ${m.line1} ${m.line2}`;
   $('#idx').textContent = String(current + 1).padStart(2, '0');
   $$('.card').forEach((c, i) => { c.classList.toggle('is-active', i === current); c.setAttribute('aria-selected', String(i === current)); });
@@ -131,6 +175,16 @@ function setCopy(m) {
     const left = act.offsetLeft - (cardsEl.clientWidth - act.offsetWidth) / 2;
     cardsEl.scrollTo({ left: Math.max(0, left), behavior: reduced ? 'auto' : 'smooth' });
   }
+}
+
+// price + "habis hari ini" badge for the menu shown in the hero (data from Neon when available)
+function setStatus(m) {
+  const live = menuData?.byId[m.id];
+  $('#price').textContent = price(live?.price ?? m.price);
+  const st = statusOf(live);
+  const el = $('#hero-status');
+  el.textContent = st === 'ada' ? '' : STATUS_TEXT[st];
+  el.className = `copy__status${st !== 'ada' ? ` badge badge--${st}` : ''}`;
 }
 
 async function show(i, dir = 1) {

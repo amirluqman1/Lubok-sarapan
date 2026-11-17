@@ -11,6 +11,7 @@
     "screenshots": "node tests/hero.cjs"
   },
   "dependencies": {
+    "@neon/neon-js": "^0.10.2",
     "gsap": "^3.13.0"
   },
   "devDependencies": {
