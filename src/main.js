@@ -85,7 +85,7 @@ $('#total').textContent = String(menus.length).padStart(2, '0');
 
 // ---------- floating ingredients
 const stage = $('#stage'), back = $('#layer-back'), front = $('#layer-front');
-const plate = $('#plate'), plateImg = $('#plate-img');
+const plate = $('#plate'), plateImg = $('#plate-img'), plateMedia = $('#plate-media');
 let floaters = [];
 let W = 400; // plate width in px (layout unit for floaters)
 
@@ -100,12 +100,13 @@ function buildFloaters(menu) {
     par.className = 'floater__par';
     const img = document.createElement('img');  // bob + rotation layer
     img.src = f.src; img.alt = ''; img.decoding = 'async';
-    if (f.blur) img.style.filter = `blur(${f.blur}px) brightness(.82)`;
     par.appendChild(img);
     wrap.appendChild(par);
     (f.front ? front : back).appendChild(wrap);
     const o = { el: wrap, par, img, f, k };
     gsap.set(par, { x: px.x * f.depth * 26, y: px.y * f.depth * 26 });
+    o.qx = gsap.quickTo(par, 'x', { duration: 0.9, ease: 'power3.out' });
+    o.qy = gsap.quickTo(par, 'y', { duration: 0.9, ease: 'power3.out' });
     place(o);
     return o;
   });
@@ -141,12 +142,15 @@ const px = { x: 0, y: 0 };
 function parallaxTo(nx, ny) {
   px.x = nx; px.y = ny;
   if (reduced) return;
+  // quickTo re-targets one running tween instead of creating ~11 new tweens per sensor event (~60/s)
   for (const o of floaters) {
     const d = o.f.depth * 26;
-    gsap.to(o.par, { x: nx * d, y: ny * d, duration: 0.9, ease: 'power3.out', overwrite: 'auto' });
+    o.qx(nx * d); o.qy(ny * d);
   }
-  gsap.to(plate, { rotationY: nx * 6, rotationX: -ny * 6, x: nx * 6, y: ny * 6, duration: 1, ease: 'power3.out', overwrite: 'auto' });
+  plateQ.ry(nx * 6); plateQ.rx(-ny * 6); plateQ.x(nx * 6); plateQ.y(ny * 6);
 }
+const plateQ = Object.fromEntries([['ry', 'rotationY'], ['rx', 'rotationX'], ['x', 'x'], ['y', 'y']]
+  .map(([k, p]) => [k, gsap.quickTo(plate, p, { duration: 1, ease: 'power3.out' })]));
 window.addEventListener('pointermove', (e) => {
   if (e.pointerType !== 'mouse') return;
   parallaxTo((e.clientX / innerWidth) * 2 - 1, (e.clientY / innerHeight) * 2 - 1);
@@ -203,7 +207,7 @@ async function show(i, dir = 1) {
     await Promise.all([
       leave(old),
       gsap.to('.copy .word, .copy__desc, .copy__kicker', { yPercent: -110, autoAlpha: 0, duration: 0.35 * d, ease: 'power2.in', stagger: 0.04 * d }),
-      gsap.to(plateImg, { xPercent: -60 * dir, rotation: -25 * dir, autoAlpha: 0, scale: 0.85, duration: 0.5 * d, ease: 'power2.in' }),
+      gsap.to(plateMedia, { xPercent: -60 * dir, rotation: -25 * dir, autoAlpha: 0, scale: 0.85, duration: 0.5 * d, ease: 'power2.in' }),
     ]);
   }
   setCopy(m);
@@ -214,7 +218,7 @@ async function show(i, dir = 1) {
   measure();
   floaters = buildFloaters(m);
 
-  gsap.fromTo(plateImg, { xPercent: 60 * dir, rotation: 25 * dir, autoAlpha: 0, scale: first ? 0.7 : 0.85 },
+  gsap.fromTo(plateMedia, { xPercent: 60 * dir, rotation: 25 * dir, autoAlpha: 0, scale: first ? 0.7 : 0.85 },
     { xPercent: 0, rotation: 0, autoAlpha: 1, scale: 1, duration: (first ? 1.4 : 0.9) * d, ease: 'expo.out' });
   gsap.fromTo('.copy .word, .copy__desc, .copy__kicker', { yPercent: 110, autoAlpha: 0 },
     { yPercent: 0, autoAlpha: 1, duration: 0.7 * d, ease: 'expo.out', stagger: 0.06 * d, delay: 0.1 * d });
@@ -279,7 +283,7 @@ navObs.observe($('#menu-lain'));
 
 // ---------- 2. hero starts when it scrolls into view
 gsap.set('.copy .word, .copy__desc, .copy__kicker, .switch, .copy__chips', { autoAlpha: 0 });
-gsap.set(plateImg, { autoAlpha: 0 });
+gsap.set(plateMedia, { autoAlpha: 0 });
 let heroStarted = false;
 const heroObs = new IntersectionObserver(([e]) => {
   if (!e.isIntersecting || heroStarted) return;

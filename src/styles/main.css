@@ -95,15 +95,21 @@ html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
 @media (min-width: 1000px) { .stage { height: min(78svh, 46vw); } }
 .plate { position: relative; z-index: 3; width: min(80vw, 54svh); perspective: 900px; transform-style: preserve-3d; }
 @media (min-width: 1000px) { .plate { width: min(36vw, 62svh); } }
-.plate__img { width: 100%; height: auto; filter: drop-shadow(0 30px 40px rgba(0, 0, 0, .45)); will-change: transform; }
+/* shadows are baked images (scripts/bake_fx.py): CSS filters re-render every animation frame → stutter on phones */
+.plate__media { position: relative; will-change: transform; }
+.plate__img { position: relative; display: block; width: 100%; height: auto; }
+/* plate-shadow.webp = plate canvas + 25% of its width padding on every side (1500×1101 plate) */
+.plate__drop { position: absolute; left: -25%; width: 150%; top: -34.06%; height: 168.12%; max-width: none; pointer-events: none; }
 .plate__shadow { position: absolute; left: 8%; right: 8%; bottom: -6%; height: 22%; border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(0, 0, 0, .55), transparent); filter: blur(6px); }
+  background: radial-gradient(closest-side, rgba(0, 0, 0, .5), rgba(0, 0, 0, .18) 60%, transparent); }
 .layer { position: absolute; inset: 0; pointer-events: none; }
 .layer--back { z-index: 2; }
 .layer--front { z-index: 4; }
 .floater { position: absolute; will-change: transform; }
 .floater__par, .floater img { width: 100%; height: 100%; }
-.floater img { object-fit: contain; filter: drop-shadow(0 16px 18px rgba(0, 0, 0, .35)); will-change: transform; }
+/* fx images carry 25% padding per side (shadow room) → draw the img 150% so the food keeps its size */
+.floater__par { position: relative; }
+.floater img { position: absolute; left: -25%; top: -25%; width: 150%; height: 150%; max-width: none; object-fit: contain; will-change: transform; }
 
 /* ---------- switcher */
 .switch { grid-area: switch; position: relative; z-index: 6; display: grid; gap: 12px; }

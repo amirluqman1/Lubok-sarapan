@@ -94,6 +94,7 @@ public/img/hero/*.webp      potongan lutsinar yang digunakan laman
 media/nasi-lemak-assembly.mp4  ⚠️ LAMA (filem skrol yang ditolak) — tidak digunakan
 scripts/cutout.py           bahan → WebP lutsinar (rembg, model isnet-general-use)
 scripts/cutout_plate.py     pinggan `hidangan-*` → WebP (flood-fill latar putih; rembg merosakkan rim pinggan)
+scripts/bake_fx.py          bakar bayang bahan terapung + kabur lapisan jauh + bayang pinggan → public/img/hero/fx/
 scripts/cutout_logo.py      logo bulat → WebP + favicon (topeng bulatan tepat)
 tests/hero.cjs              Playwright: intro → hero (6 menu) → menu lain, telefon + desktop
 tests/menu.cjs              Playwright dengan respons Neon TIRUAN: lencana Habis/Tutup, fallback, skrin admin
@@ -102,7 +103,9 @@ db/schema.sql               skema + migrasi + nota ujian
 
 ### Tambah gambar
 - **Bahan / lauk terapung:** simpan `media/assets/<nama>.jpg` → `python scripts/cutout.py <nama>` → tambah `<nama>`
-  dalam `availableImages` (`src/config/menu.js`).
+  dalam `availableImages` (`src/config/menu.js`) **dan** dalam senarai `names` di `scripts/bake_fx.py` → `python scripts/bake_fx.py`
+  (bayang/kabur dibakar ke `public/img/hero/fx/`; laman memuat versi fx). ⚠️ Jangan guna CSS `filter` (drop-shadow/blur)
+  pada benda yang beranimasi — GPU telefon kira semula setiap frame → tersekat (diukur: 12.5 ms → 4 ms sebingkai selepas dibakar).
 - **Pinggan menu nasi lemak:** `media/assets/hidangan-<id>.jpg` → `python scripts/cutout_plate.py hidangan-<id>`.
 - **Foto sebenar menu lain:** mampat ke `public/img/menu/<id>.webp` (~1200px, kualiti ~78), isi lajur `image` di DB
   (`img/menu/<id>.webp`); render sudah sokong `image` (thumbnail dalam senarai).

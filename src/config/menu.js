@@ -5,7 +5,8 @@
 const base = 'img/hero/';
 
 // Floating ingredient layout, in units of the plate's width (W), relative to the plate centre.
-// depth: parallax strength (0 = far, 1+ = near). blur: px (far layers). size: × W. rot: degrees.
+// depth: parallax strength (0 = far, 1+ = near). blur: px (far layers) — must have a baked
+// variant in public/img/hero/fx (scripts/bake_fx.py BLURS). size: × W. rot: degrees.
 // front: true → drawn above the plate.
 const common = [
   { img: 'daun-pandan', x: -0.5, y: -0.2, size: 0.4, rot: -38, depth: 0.25, blur: 5 },
@@ -67,7 +68,9 @@ export const menus = [
 
 export function floatersFor(menu) {
   const ex = new Set(menu.exclude || []);
-  return [...common.filter((f) => !ex.has(f.img)), menu.signature].map((f) => ({ ...f, src: `${base}${f.img}.webp` }));
+  // fx/ = shadow (or depth blur) baked in by scripts/bake_fx.py — no CSS filters while animating
+  return [...common.filter((f) => !ex.has(f.img)), menu.signature]
+    .map((f) => ({ ...f, src: `${base}fx/${f.img}${f.blur ? `-b${String(f.blur).replace('.', '_')}` : ''}.webp` }));
 }
 
 /** Ingredient images that exist (signature images of menus without a photo are skipped). */
